@@ -1,4 +1,4 @@
-from app import *
+from corpus import Corpus
 
 
 class Artwork:
@@ -7,7 +7,7 @@ class Artwork:
         self.objectvalue = data['object.value']
         date = data['dates.value']
         date = date.split('-')
-        self.date = date[0]
+        self.date = int(date[0])
         self.creators = str(data['creators.value']).split(';')
         self.depictions = str(data['depictions.value']).split(';')
         self.images = str(data['images.value']).split(';')

@@ -3,8 +3,8 @@ import networkx as nx
 import numpy as np
 from tqdm.auto import tqdm
 import pandas as pd
-from artwork import *
-from saint import *
+from artwork import Artwork
+from saint import Saint
 import community as community_louvain
 from pyvis.network import Network
 
@@ -72,16 +72,6 @@ class Corpus:
                         if artwork.depictions[x] != artwork.depictions[y]:
                             if artwork.depictions[x] in self.saintuids and artwork.depictions[y] in self.saintuids:
                                 saint.connections.append(((saints[str(artwork.depictions[x])], saints[str(artwork.depictions[y])]), artwork))
-
-                            #elif artwork.depictions[x] in self.saintuids:
-                            #    saint.connections.append(((saints[str(artwork.depictions[x])], artwork.depictions[y]), artwork))
-
-                            #elif artwork.depictions[y] in self.saintuids:
-                            #    saint.connections.append((((artwork.depictions[x]),saints[str(artwork.depictions[y])]), artwork))
-
-                            #else:
-                             #   if artwork.depictions[x] != artwork.depictions[y]:
-                              #      saint.connections.append(((artwork.depictions[x], artwork.depictions[y]), artwork))
                         y += 1
                         if y == len(artwork.depictions):
                             x += 1
@@ -143,12 +133,11 @@ class Corpus:
         node_freq = {}
         node_degree = dict(G.degree)
         nx.set_node_attributes(G, node_degree, 'size')
-        G2 = Network(width='1500px', height='1000px', bgcolor='#222222', font_color='white', select_menu=True, filter_menu=True)
+        G2 = Network(width='1500px', height='1000px', bgcolor='#222222', font_color='white', select_menu=True)
         G2.from_nx(G)
         G2.force_atlas_2based()
         G2.show_buttons(filter_='physics')
-        G2.save_graph('corpus_network.html')
-        G2.show("./networks/corpus_saints_network.html", notebook=False)
+        return G2
 
 
 if __name__ == "__main__":

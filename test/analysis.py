@@ -34,9 +34,9 @@ def plot_hiso(years):
 
 
 # load datasets
-sdf = pd.read_json('./data/saints.json')
+sdf = pd.read_json('../data/saints.json')
 saintuids = sdf['saintUID.value'].tolist()
-odf = pd.read_json('./data/2d_objects.json')
+odf = pd.read_json('../data/2d_objects.json')
 
 # only depictions of saints
 sodf = only_saint_depictions(odf)
@@ -45,7 +45,7 @@ sodf = only_saint_depictions(odf)
 objs = uniques(sodf.index.values.tolist())
 
 #reset odf and only show uniques
-odf = pd.read_json('./data/2d_objects.json')
+odf = pd.read_json('../data/2d_objects.json')
 odf = odf.loc[objs]
 
 years = []

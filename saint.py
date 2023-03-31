@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 import networkx as nx
-from corpus import *
-from tqdm.auto import tqdm
+from corpus import Corpus
 from pyvis.network import Network
 import community as community_louvain
+import numpy as np
 
 
 class Saint:
@@ -42,7 +42,6 @@ class Saint:
         f.suptitle(f'Year frequency of {self.name}')
         return f
 
-
     def build_network(self):
         G = nx.Graph()
         edge_weight = {}
@@ -56,24 +55,19 @@ class Saint:
         for edge in edge_weight:
             G.add_edge(edge[0], edge[1], weight=edge_weight[edge])
         label = {}
-        for node in G.nodes:label[node] = node.name
+        for node in G.nodes:
+            label[node] = node.name
         nx.relabel_nodes(G, label, copy=False)
-        node_freq = {}
-        # for edge in G.edges:
-        #    for dep in edge:
-        #        if dep in node_freq:
-        #            node_freq[dep] += 1
-        #        else:
-        #            node_freq[dep] = 1
         node_degree = dict(G.degree)
-        # print(node_degree)
+
         nx.set_node_attributes(G, node_degree, 'size')
         communities = community_louvain.best_partition(G)
         nx.set_node_attributes(G, communities, 'group')
-        G2 = Network(width='1500px', height ='1000px', bgcolor='#222222', font_color='white', select_menu=True)
+        G2 = Network(width='1500px', height='1000px', bgcolor='#222222', font_color='white', select_menu=True)
         G2.from_nx(G)
         G2.force_atlas_2based()
-        G2.show(f"network_of_{self.name}.html", notebook=False)
+        return G2
+
 
 if __name__ == "__main__":
     x = Corpus()
