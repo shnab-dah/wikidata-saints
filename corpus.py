@@ -1,13 +1,11 @@
-import matplotlib.pyplot as plt
 import networkx as nx
-import numpy as np
-from tqdm.auto import tqdm
 import pandas as pd
+from pandas.plotting._matplotlib import plot
+
 from artwork import Artwork
 from saint import Saint
 import community as community_louvain
-from pyvis.network import Network
-
+import plotly.express as px
 
 class Corpus:
     def __init__(self):
@@ -40,6 +38,12 @@ class Corpus:
         self.odf = self.odf.loc[objs]
         self.artworks = self.init_artworks()
         self.saints = self.init_saints()
+        self.QIDsaints = {}
+        self.QIDartworks= {}
+        for a in self.artworks.values():
+            self.QIDartworks[a.QID] = a
+        for s in self.saints.values():
+            self.QIDsaints[s.QID] = s
 
     def init_artworks(self):
         artworks = {}
@@ -58,7 +62,7 @@ class Corpus:
                     else:
                         saints[depiction].artworks.append(artwork)
         # adds connections in artworks to saint objects ((depicted1, depicted2), artwork)
-        for saint in tqdm(saints.values()):
+        for saint in saints.values():
             # update some vars
             saint.frequency = len(saint.artworks)
             saint.name = self.saintnames[saint.QID]
@@ -71,7 +75,8 @@ class Corpus:
                     while x < len(artwork.depictions) - 1:
                         if artwork.depictions[x] != artwork.depictions[y]:
                             if artwork.depictions[x] in self.saintuids and artwork.depictions[y] in self.saintuids:
-                                saint.connections.append(((saints[str(artwork.depictions[x])], saints[str(artwork.depictions[y])]), artwork))
+                                saint.connections.append(
+                                    ((saints[str(artwork.depictions[x])], saints[str(artwork.depictions[y])]), artwork))
                         y += 1
                         if y == len(artwork.depictions):
                             x += 1
@@ -79,24 +84,17 @@ class Corpus:
         return saints
 
     def plot_histo(self):
-        f = plt.figure()
         dates = self.odf['dates.value'].tolist()
         years = []
         for year in dates:
             year = year.split('-')
             years.append(int(year[0]))
         years.sort()
-        # bins by Fred-Diacconis rule
-        try:
-            q25, q75 = np.percentile(years, [25, 75])
-            bin_width = 2 * (q25 - q75) * len(years) ** (-1 / 3)
-            bins = round((years[0] - years[len(years) - 1]) / bin_width)
-        except:
-            bins = 10
-        if bins < 10:
-            bins = 10
-        plt.hist(years, density=False, bins=bins, figure=f)
-        return f
+        df = pd.DataFrame(years, columns=['year'])
+        fig = px.histogram(df, x="year")
+        fig.update_layout(xaxis_title=None)
+        fig.update_layout(yaxis_title=None)
+        return fig
 
     def show_network(self):
         connections = []
@@ -128,18 +126,32 @@ class Corpus:
         communities = community_louvain.best_partition(G)
         nx.set_node_attributes(G, communities, 'group')
         label = {}
-        for node in G.nodes: label[node] = node.name
+        for node in G.nodes:
+            label[node] = node.name
         nx.relabel_nodes(G, label, copy=False)
-        node_freq = {}
         node_degree = dict(G.degree)
         nx.set_node_attributes(G, node_degree, 'size')
-        G2 = Network(width='1500px', height='1000px', bgcolor='#222222', font_color='white', select_menu=True)
-        G2.from_nx(G)
-        G2.force_atlas_2based()
-        G2.show_buttons(filter_='physics')
-        return G2
+        return G
 
 
 if __name__ == "__main__":
-    x = Corpus()
-    x.show_network()
+    corp = Corpus()
+    G = corp.show_network()
+    pd.options.plotting.backend = 'plotly'
+    #degree centrality
+    degree_dict = nx.degree_centrality(G)
+    degree_df = pd.DataFrame.from_dict(degree_dict, orient='index', columns=['centrality'])
+    #closeness centrality
+    closeness_dict = nx.closeness_centrality(G)
+    closeness_df = pd.DataFrame.from_dict(closeness_dict, orient='index', columns=['centrality'])
+    #betweenness centrality
+    betweenness_dict = nx.betweenness_centrality(G)
+    betweenness_df = pd.DataFrame.from_dict(betweenness_dict, orient='index', columns=['centrality'])
+
+    fig1 = degree_df.sort_values('centrality', ascending=False)[0:9].plot.bar(title='Degree centrality')
+    fig2 = closeness_df.sort_values('centrality', ascending=False)[0:9].plot.bar(title='Closeness centrality')
+    fig3 = betweenness_df.sort_values('centrality', ascending=False)[0:9].plot.bar(title='Betweenness centrality')
+
+    fig1.show()
+    fig2.show()
+    fig3.show()

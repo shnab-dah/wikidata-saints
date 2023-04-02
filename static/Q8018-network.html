@@ -1,0 +1,164 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 750;
+                 background-color: #222222;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"font": {"color": "white"}, "group": 0, "id": "Augustine of Hippo", "label": "Augustine of Hippo", "shape": "dot", "size": 60}, {"font": {"color": "white"}, "group": 0, "id": "Gregory I", "label": "Gregory I", "shape": "dot", "size": 11}, {"font": {"color": "white"}, "group": 0, "id": "Ambrose", "label": "Ambrose", "shape": "dot", "size": 12}, {"font": {"color": "white"}, "group": 0, "id": "Jerome", "label": "Jerome", "shape": "dot", "size": 14}, {"font": {"color": "white"}, "group": 0, "id": "Saint Nicholas", "label": "Saint Nicholas", "shape": "dot", "size": 7}, {"font": {"color": "white"}, "group": 0, "id": "Virgin Mary", "label": "Virgin Mary", "shape": "dot", "size": 45}, {"font": {"color": "white"}, "group": 2, "id": "Peter", "label": "Peter", "shape": "dot", "size": 13}, {"font": {"color": "white"}, "group": 0, "id": "John the Baptist", "label": "John the Baptist", "shape": "dot", "size": 20}, {"font": {"color": "white"}, "group": 0, "id": "Stephen", "label": "Stephen", "shape": "dot", "size": 5}, {"font": {"color": "white"}, "group": 2, "id": "Francis of Assisi", "label": "Francis of Assisi", "shape": "dot", "size": 14}, {"font": {"color": "white"}, "group": 0, "id": "Sulpicius Severus", "label": "Sulpicius Severus", "shape": "dot", "size": 2}, {"font": {"color": "white"}, "group": 1, "id": "Catherine of Alexandria", "label": "Catherine of Alexandria", "shape": "dot", "size": 19}, {"font": {"color": "white"}, "group": 0, "id": "Joseph", "label": "Joseph", "shape": "dot", "size": 7}, {"font": {"color": "white"}, "group": 0, "id": "Catherine of Siena", "label": "Catherine of Siena", "shape": "dot", "size": 9}, {"font": {"color": "white"}, "group": 0, "id": "Saint Christopher", "label": "Saint Christopher", "shape": "dot", "size": 4}, {"font": {"color": "white"}, "group": 0, "id": "Saint Anne", "label": "Saint Anne", "shape": "dot", "size": 3}, {"font": {"color": "white"}, "group": 1, "id": "Anthony of Padua", "label": "Anthony of Padua", "shape": "dot", "size": 2}, {"font": {"color": "white"}, "group": 0, "id": "Thomas of Villanova", "label": "Thomas of Villanova", "shape": "dot", "size": 1}, {"font": {"color": "white"}, "group": 3, "id": "Mary Magdalene", "label": "Mary Magdalene", "shape": "dot", "size": 23}, {"font": {"color": "white"}, "group": 3, "id": "Saint Cecilia", "label": "Saint Cecilia", "shape": "dot", "size": 5}, {"font": {"color": "white"}, "group": 3, "id": "Dorothea of Caesarea", "label": "Dorothea of Caesarea", "shape": "dot", "size": 5}, {"font": {"color": "white"}, "group": 2, "id": "Paul the Apostle", "label": "Paul the Apostle", "shape": "dot", "size": 4}, {"font": {"color": "white"}, "group": 0, "id": "Fridianus", "label": "Fridianus", "shape": "dot", "size": 2}, {"font": {"color": "white"}, "group": 0, "id": "John the Apostle", "label": "John the Apostle", "shape": "dot", "size": 12}, {"font": {"color": "white"}, "group": 0, "id": "Monica of Hippo", "label": "Monica of Hippo", "shape": "dot", "size": 2}, {"font": {"color": "white"}, "group": 4, "id": "Saint Rita of Cascia", "label": "Saint Rita of Cascia", "shape": "dot", "size": 2}, {"font": {"color": "white"}, "group": 4, "id": "Nicholas of Tolentino", "label": "Nicholas of Tolentino", "shape": "dot", "size": 2}, {"font": {"color": "white"}, "group": 2, "id": "Bonaventure", "label": "Bonaventure", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "group": 2, "id": "Clare of Assisi", "label": "Clare of Assisi", "shape": "dot", "size": 4}, {"font": {"color": "white"}, "group": 2, "id": "Louis of Toulouse", "label": "Louis of Toulouse", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "group": 1, "id": "Agatha of Sicily", "label": "Agatha of Sicily", "shape": "dot", "size": 11}, {"font": {"color": "white"}, "group": 1, "id": "Saint Dominic", "label": "Saint Dominic", "shape": "dot", "size": 8}, {"font": {"color": "white"}, "group": 1, "id": "Michael", "label": "Michael", "shape": "dot", "size": 15}, {"font": {"color": "white"}, "group": 1, "id": "Urban V", "label": "Urban V", "shape": "dot", "size": 3}, {"font": {"color": "white"}, "group": 0, "id": "Medardus", "label": "Medardus", "shape": "dot", "size": 2}, {"font": {"color": "white"}, "group": 0, "id": "Mark the Evangelist", "label": "Mark the Evangelist", "shape": "dot", "size": 13}, {"font": {"color": "white"}, "group": 3, "id": "St. James the Elder, Apostle", "label": "St. James the Elder, Apostle", "shape": "dot", "size": 9}, {"font": {"color": "white"}, "group": 0, "id": "Benedict of Nursia", "label": "Benedict of Nursia", "shape": "dot", "size": 1}, {"font": {"color": "white"}, "group": 3, "id": "Lawrence of Rome", "label": "Lawrence of Rome", "shape": "dot", "size": 11}, {"font": {"color": "white"}, "group": 3, "id": "Blaise of Sebaste", "label": "Blaise of Sebaste", "shape": "dot", "size": 8}, {"font": {"color": "white"}, "group": 3, "id": "Anthony the Great", "label": "Anthony the Great", "shape": "dot", "size": 15}, {"font": {"color": "white"}, "group": 3, "id": "Saint Lucy", "label": "Saint Lucy", "shape": "dot", "size": 8}, {"font": {"color": "white"}, "group": 3, "id": "Philip the Evangelist", "label": "Philip the Evangelist", "shape": "dot", "size": 8}, {"font": {"color": "white"}, "group": 0, "id": "Matthew the Apostle", "label": "Matthew the Apostle", "shape": "dot", "size": 8}, {"font": {"color": "white"}, "group": 0, "id": "Luke the Evangelist", "label": "Luke the Evangelist", "shape": "dot", "size": 8}, {"font": {"color": "white"}, "group": 0, "id": "John the Evangelist", "label": "John the Evangelist", "shape": "dot", "size": 11}, {"font": {"color": "white"}, "group": 1, "id": "Saint Barbara", "label": "Saint Barbara", "shape": "dot", "size": 3}, {"font": {"color": "white"}, "group": 0, "id": "Philip the Apostle", "label": "Philip the Apostle", "shape": "dot", "size": 3}, {"font": {"color": "white"}, "group": 3, "id": "Saint Sebastian", "label": "Saint Sebastian", "shape": "dot", "size": 5}, {"font": {"color": "white"}, "group": 3, "id": "Peter of Verona", "label": "Peter of Verona", "shape": "dot", "size": 5}, {"font": {"color": "white"}, "group": 1, "id": "Athanasios of Alexandria", "label": "Athanasios of Alexandria", "shape": "dot", "size": 4}, {"font": {"color": "white"}, "group": 1, "id": "Gabriel", "label": "Gabriel", "shape": "dot", "size": 4}, {"font": {"color": "white"}, "group": 0, "id": "Zachary", "label": "Zachary", "shape": "dot", "size": 3}, {"font": {"color": "white"}, "group": 0, "id": "Elizabeth", "label": "Elizabeth", "shape": "dot", "size": 3}, {"font": {"color": "white"}, "group": 1, "id": "Bartholomew the Apostle", "label": "Bartholomew the Apostle", "shape": "dot", "size": 8}, {"font": {"color": "white"}, "group": 1, "id": "Saint Apollonia", "label": "Saint Apollonia", "shape": "dot", "size": 8}, {"font": {"color": "white"}, "group": 1, "id": "Ignatius of Antioch", "label": "Ignatius of Antioch", "shape": "dot", "size": 6}, {"font": {"color": "white"}, "group": 1, "id": "Barnabas", "label": "Barnabas", "shape": "dot", "size": 6}, {"font": {"color": "white"}, "group": 2, "id": "John of Capistrano", "label": "John of Capistrano", "shape": "dot", "size": 8}, {"font": {"color": "white"}, "group": 2, "id": "James of the Marches", "label": "James of the Marches", "shape": "dot", "size": 8}, {"font": {"color": "white"}, "group": 0, "id": "Beato Constancio de Fabriano", "label": "Beato Constancio de Fabriano", "shape": "dot", "size": 4}]);
+                  edges = new vis.DataSet([{"from": "Augustine of Hippo", "to": "Gregory I", "width": 7}, {"from": "Augustine of Hippo", "to": "Ambrose", "width": 10}, {"from": "Augustine of Hippo", "to": "Jerome", "width": 13}, {"from": "Augustine of Hippo", "to": "Saint Nicholas", "width": 3}, {"from": "Augustine of Hippo", "to": "Virgin Mary", "width": 28}, {"from": "Augustine of Hippo", "to": "Peter", "width": 5}, {"from": "Augustine of Hippo", "to": "John the Baptist", "width": 8}, {"from": "Augustine of Hippo", "to": "Stephen", "width": 2}, {"from": "Augustine of Hippo", "to": "Francis of Assisi", "width": 5}, {"from": "Augustine of Hippo", "to": "Sulpicius Severus", "width": 1}, {"from": "Augustine of Hippo", "to": "Catherine of Alexandria", "width": 6}, {"from": "Augustine of Hippo", "to": "Joseph", "width": 3}, {"from": "Augustine of Hippo", "to": "Catherine of Siena", "width": 3}, {"from": "Augustine of Hippo", "to": "Saint Christopher", "width": 1}, {"from": "Augustine of Hippo", "to": "Saint Anne", "width": 1}, {"from": "Augustine of Hippo", "to": "Anthony of Padua", "width": 1}, {"from": "Augustine of Hippo", "to": "Thomas of Villanova", "width": 1}, {"from": "Augustine of Hippo", "to": "Mary Magdalene", "width": 5}, {"from": "Augustine of Hippo", "to": "Saint Cecilia", "width": 1}, {"from": "Augustine of Hippo", "to": "Dorothea of Caesarea", "width": 1}, {"from": "Augustine of Hippo", "to": "Paul the Apostle", "width": 1}, {"from": "Augustine of Hippo", "to": "Fridianus", "width": 1}, {"from": "Augustine of Hippo", "to": "John the Apostle", "width": 4}, {"from": "Augustine of Hippo", "to": "Monica of Hippo", "width": 3}, {"from": "Augustine of Hippo", "to": "Saint Rita of Cascia", "width": 1}, {"from": "Augustine of Hippo", "to": "Nicholas of Tolentino", "width": 1}, {"from": "Augustine of Hippo", "to": "Bonaventure", "width": 2}, {"from": "Augustine of Hippo", "to": "Clare of Assisi", "width": 1}, {"from": "Augustine of Hippo", "to": "Louis of Toulouse", "width": 2}, {"from": "Augustine of Hippo", "to": "Agatha of Sicily", "width": 2}, {"from": "Augustine of Hippo", "to": "Saint Dominic", "width": 3}, {"from": "Augustine of Hippo", "to": "Michael", "width": 4}, {"from": "Augustine of Hippo", "to": "Urban V", "width": 1}, {"from": "Augustine of Hippo", "to": "Medardus", "width": 1}, {"from": "Augustine of Hippo", "to": "Mark the Evangelist", "width": 2}, {"from": "Augustine of Hippo", "to": "St. James the Elder, Apostle", "width": 2}, {"from": "Augustine of Hippo", "to": "Benedict of Nursia", "width": 1}, {"from": "Augustine of Hippo", "to": "Lawrence of Rome", "width": 3}, {"from": "Augustine of Hippo", "to": "Blaise of Sebaste", "width": 1}, {"from": "Augustine of Hippo", "to": "Anthony the Great", "width": 3}, {"from": "Augustine of Hippo", "to": "Saint Lucy", "width": 1}, {"from": "Augustine of Hippo", "to": "Philip the Evangelist", "width": 1}, {"from": "Augustine of Hippo", "to": "Matthew the Apostle", "width": 1}, {"from": "Augustine of Hippo", "to": "Luke the Evangelist", "width": 1}, {"from": "Augustine of Hippo", "to": "John the Evangelist", "width": 3}, {"from": "Augustine of Hippo", "to": "Saint Barbara", "width": 1}, {"from": "Augustine of Hippo", "to": "Philip the Apostle", "width": 1}, {"from": "Augustine of Hippo", "to": "Saint Sebastian", "width": 1}, {"from": "Augustine of Hippo", "to": "Peter of Verona", "width": 1}, {"from": "Augustine of Hippo", "to": "Athanasios of Alexandria", "width": 1}, {"from": "Augustine of Hippo", "to": "Gabriel", "width": 1}, {"from": "Augustine of Hippo", "to": "Zachary", "width": 1}, {"from": "Augustine of Hippo", "to": "Elizabeth", "width": 1}, {"from": "Augustine of Hippo", "to": "Bartholomew the Apostle", "width": 1}, {"from": "Augustine of Hippo", "to": "Saint Apollonia", "width": 1}, {"from": "Augustine of Hippo", "to": "Ignatius of Antioch", "width": 1}, {"from": "Augustine of Hippo", "to": "Barnabas", "width": 1}, {"from": "Augustine of Hippo", "to": "John of Capistrano", "width": 1}, {"from": "Augustine of Hippo", "to": "James of the Marches", "width": 1}, {"from": "Augustine of Hippo", "to": "Beato Constancio de Fabriano", "width": 1}, {"from": "Gregory I", "to": "Ambrose", "width": 6}, {"from": "Gregory I", "to": "Jerome", "width": 7}, {"from": "Gregory I", "to": "Saint Nicholas", "width": 1}, {"from": "Gregory I", "to": "Virgin Mary", "width": 2}, {"from": "Gregory I", "to": "John the Baptist", "width": 1}, {"from": "Gregory I", "to": "John the Apostle", "width": 1}, {"from": "Gregory I", "to": "Mark the Evangelist", "width": 1}, {"from": "Gregory I", "to": "Matthew the Apostle", "width": 1}, {"from": "Gregory I", "to": "Luke the Evangelist", "width": 1}, {"from": "Gregory I", "to": "John the Evangelist", "width": 1}, {"from": "Ambrose", "to": "Jerome", "width": 6}, {"from": "Ambrose", "to": "Saint Nicholas", "width": 1}, {"from": "Ambrose", "to": "Virgin Mary", "width": 2}, {"from": "Ambrose", "to": "John the Baptist", "width": 1}, {"from": "Ambrose", "to": "John the Apostle", "width": 1}, {"from": "Ambrose", "to": "Monica of Hippo", "width": 1}, {"from": "Ambrose", "to": "Mark the Evangelist", "width": 1}, {"from": "Ambrose", "to": "Matthew the Apostle", "width": 1}, {"from": "Ambrose", "to": "Luke the Evangelist", "width": 1}, {"from": "Ambrose", "to": "John the Evangelist", "width": 1}, {"from": "Jerome", "to": "Saint Nicholas", "width": 2}, {"from": "Jerome", "to": "Virgin Mary", "width": 5}, {"from": "Jerome", "to": "John the Baptist", "width": 2}, {"from": "Jerome", "to": "Sulpicius Severus", "width": 1}, {"from": "Jerome", "to": "Saint Christopher", "width": 1}, {"from": "Jerome", "to": "Saint Anne", "width": 1}, {"from": "Jerome", "to": "John the Apostle", "width": 1}, {"from": "Jerome", "to": "Mark the Evangelist", "width": 1}, {"from": "Jerome", "to": "Matthew the Apostle", "width": 1}, {"from": "Jerome", "to": "Luke the Evangelist", "width": 1}, {"from": "Jerome", "to": "John the Evangelist", "width": 1}, {"from": "Saint Nicholas", "to": "Virgin Mary", "width": 1}, {"from": "Saint Nicholas", "to": "John the Baptist", "width": 1}, {"from": "Saint Nicholas", "to": "Saint Christopher", "width": 1}, {"from": "Virgin Mary", "to": "Peter", "width": 3}, {"from": "Virgin Mary", "to": "John the Baptist", "width": 5}, {"from": "Virgin Mary", "to": "Stephen", "width": 2}, {"from": "Virgin Mary", "to": "Francis of Assisi", "width": 3}, {"from": "Virgin Mary", "to": "Catherine of Alexandria", "width": 4}, {"from": "Virgin Mary", "to": "Joseph", "width": 3}, {"from": "Virgin Mary", "to": "Catherine of Siena", "width": 3}, {"from": "Virgin Mary", "to": "Saint Christopher", "width": 1}, {"from": "Virgin Mary", "to": "Saint Anne", "width": 1}, {"from": "Virgin Mary", "to": "Mary Magdalene", "width": 4}, {"from": "Virgin Mary", "to": "Saint Cecilia", "width": 1}, {"from": "Virgin Mary", "to": "Dorothea of Caesarea", "width": 1}, {"from": "Virgin Mary", "to": "Paul the Apostle", "width": 1}, {"from": "Virgin Mary", "to": "Fridianus", "width": 1}, {"from": "Virgin Mary", "to": "John the Apostle", "width": 3}, {"from": "Virgin Mary", "to": "Bonaventure", "width": 1}, {"from": "Virgin Mary", "to": "Louis of Toulouse", "width": 1}, {"from": "Virgin Mary", "to": "Agatha of Sicily", "width": 1}, {"from": "Virgin Mary", "to": "Saint Dominic", "width": 1}, {"from": "Virgin Mary", "to": "Michael", "width": 3}, {"from": "Virgin Mary", "to": "Medardus", "width": 1}, {"from": "Virgin Mary", "to": "Mark the Evangelist", "width": 1}, {"from": "Virgin Mary", "to": "St. James the Elder, Apostle", "width": 1}, {"from": "Virgin Mary", "to": "Lawrence of Rome", "width": 2}, {"from": "Virgin Mary", "to": "Blaise of Sebaste", "width": 1}, {"from": "Virgin Mary", "to": "Anthony the Great", "width": 2}, {"from": "Virgin Mary", "to": "Saint Lucy", "width": 1}, {"from": "Virgin Mary", "to": "Philip the Evangelist", "width": 1}, {"from": "Virgin Mary", "to": "John the Evangelist", "width": 1}, {"from": "Virgin Mary", "to": "Athanasios of Alexandria", "width": 1}, {"from": "Virgin Mary", "to": "Gabriel", "width": 1}, {"from": "Virgin Mary", "to": "Zachary", "width": 1}, {"from": "Virgin Mary", "to": "Elizabeth", "width": 1}, {"from": "Virgin Mary", "to": "Bartholomew the Apostle", "width": 1}, {"from": "Virgin Mary", "to": "Saint Apollonia", "width": 1}, {"from": "Virgin Mary", "to": "Ignatius of Antioch", "width": 1}, {"from": "Virgin Mary", "to": "Barnabas", "width": 1}, {"from": "Virgin Mary", "to": "John of Capistrano", "width": 1}, {"from": "Virgin Mary", "to": "James of the Marches", "width": 1}, {"from": "Virgin Mary", "to": "Beato Constancio de Fabriano", "width": 1}, {"from": "Peter", "to": "John the Baptist", "width": 1}, {"from": "Peter", "to": "Stephen", "width": 1}, {"from": "Peter", "to": "Francis of Assisi", "width": 3}, {"from": "Peter", "to": "Catherine of Alexandria", "width": 1}, {"from": "Peter", "to": "Mary Magdalene", "width": 1}, {"from": "Peter", "to": "Paul the Apostle", "width": 1}, {"from": "Peter", "to": "Bonaventure", "width": 1}, {"from": "Peter", "to": "Louis of Toulouse", "width": 1}, {"from": "Peter", "to": "St. James the Elder, Apostle", "width": 1}, {"from": "Peter", "to": "John of Capistrano", "width": 1}, {"from": "Peter", "to": "James of the Marches", "width": 1}, {"from": "John the Baptist", "to": "Stephen", "width": 1}, {"from": "John the Baptist", "to": "Francis of Assisi", "width": 1}, {"from": "John the Baptist", "to": "Catherine of Alexandria", "width": 2}, {"from": "John the Baptist", "to": "Joseph", "width": 2}, {"from": "John the Baptist", "to": "Catherine of Siena", "width": 1}, {"from": "John the Baptist", "to": "John the Apostle", "width": 1}, {"from": "John the Baptist", "to": "Michael", "width": 1}, {"from": "John the Baptist", "to": "Mark the Evangelist", "width": 2}, {"from": "John the Baptist", "to": "Matthew the Apostle", "width": 1}, {"from": "John the Baptist", "to": "Luke the Evangelist", "width": 1}, {"from": "John the Baptist", "to": "John the Evangelist", "width": 1}, {"from": "John the Baptist", "to": "Ignatius of Antioch", "width": 1}, {"from": "John the Baptist", "to": "Barnabas", "width": 1}, {"from": "Stephen", "to": "Francis of Assisi", "width": 1}, {"from": "Francis of Assisi", "to": "Mary Magdalene", "width": 2}, {"from": "Francis of Assisi", "to": "Paul the Apostle", "width": 1}, {"from": "Francis of Assisi", "to": "Bonaventure", "width": 1}, {"from": "Francis of Assisi", "to": "Louis of Toulouse", "width": 1}, {"from": "Francis of Assisi", "to": "Lawrence of Rome", "width": 1}, {"from": "Francis of Assisi", "to": "Saint Sebastian", "width": 1}, {"from": "Francis of Assisi", "to": "Peter of Verona", "width": 1}, {"from": "Francis of Assisi", "to": "John of Capistrano", "width": 1}, {"from": "Francis of Assisi", "to": "James of the Marches", "width": 1}, {"from": "Catherine of Alexandria", "to": "Joseph", "width": 1}, {"from": "Catherine of Alexandria", "to": "Catherine of Siena", "width": 1}, {"from": "Catherine of Alexandria", "to": "Anthony of Padua", "width": 1}, {"from": "Catherine of Alexandria", "to": "Mary Magdalene", "width": 2}, {"from": "Catherine of Alexandria", "to": "Saint Cecilia", "width": 1}, {"from": "Catherine of Alexandria", "to": "Dorothea of Caesarea", "width": 1}, {"from": "Catherine of Alexandria", "to": "John the Apostle", "width": 1}, {"from": "Catherine of Alexandria", "to": "Agatha of Sicily", "width": 1}, {"from": "Catherine of Alexandria", "to": "Michael", "width": 2}, {"from": "Catherine of Alexandria", "to": "Mark the Evangelist", "width": 1}, {"from": "Catherine of Alexandria", "to": "Anthony the Great", "width": 1}, {"from": "Catherine of Alexandria", "to": "Bartholomew the Apostle", "width": 1}, {"from": "Catherine of Alexandria", "to": "Saint Apollonia", "width": 1}, {"from": "Catherine of Alexandria", "to": "Ignatius of Antioch", "width": 1}, {"from": "Catherine of Alexandria", "to": "Barnabas", "width": 1}, {"from": "Joseph", "to": "Catherine of Siena", "width": 2}, {"from": "Joseph", "to": "John the Apostle", "width": 1}, {"from": "Joseph", "to": "Mark the Evangelist", "width": 1}, {"from": "Catherine of Siena", "to": "John the Apostle", "width": 1}, {"from": "Catherine of Siena", "to": "Saint Dominic", "width": 1}, {"from": "Catherine of Siena", "to": "Mark the Evangelist", "width": 1}, {"from": "Catherine of Siena", "to": "Beato Constancio de Fabriano", "width": 1}, {"from": "Mary Magdalene", "to": "Saint Cecilia", "width": 1}, {"from": "Mary Magdalene", "to": "Dorothea of Caesarea", "width": 1}, {"from": "Mary Magdalene", "to": "Bonaventure", "width": 1}, {"from": "Mary Magdalene", "to": "Louis of Toulouse", "width": 1}, {"from": "Mary Magdalene", "to": "Agatha of Sicily", "width": 1}, {"from": "Mary Magdalene", "to": "Michael", "width": 1}, {"from": "Mary Magdalene", "to": "St. James the Elder, Apostle", "width": 1}, {"from": "Mary Magdalene", "to": "Lawrence of Rome", "width": 2}, {"from": "Mary Magdalene", "to": "Blaise of Sebaste", "width": 1}, {"from": "Mary Magdalene", "to": "Anthony the Great", "width": 2}, {"from": "Mary Magdalene", "to": "Saint Lucy", "width": 1}, {"from": "Mary Magdalene", "to": "Philip the Evangelist", "width": 1}, {"from": "Mary Magdalene", "to": "Saint Sebastian", "width": 1}, {"from": "Mary Magdalene", "to": "Peter of Verona", "width": 1}, {"from": "Mary Magdalene", "to": "Bartholomew the Apostle", "width": 1}, {"from": "Mary Magdalene", "to": "Saint Apollonia", "width": 1}, {"from": "Mary Magdalene", "to": "John of Capistrano", "width": 1}, {"from": "Mary Magdalene", "to": "James of the Marches", "width": 1}, {"from": "Saint Cecilia", "to": "Dorothea of Caesarea", "width": 1}, {"from": "John the Apostle", "to": "Mark the Evangelist", "width": 1}, {"from": "John the Apostle", "to": "John the Evangelist", "width": 1}, {"from": "John the Apostle", "to": "Philip the Apostle", "width": 1}, {"from": "Saint Rita of Cascia", "to": "Nicholas of Tolentino", "width": 1}, {"from": "Bonaventure", "to": "Clare of Assisi", "width": 1}, {"from": "Bonaventure", "to": "Louis of Toulouse", "width": 2}, {"from": "Bonaventure", "to": "Agatha of Sicily", "width": 1}, {"from": "Bonaventure", "to": "John of Capistrano", "width": 1}, {"from": "Bonaventure", "to": "James of the Marches", "width": 1}, {"from": "Clare of Assisi", "to": "Louis of Toulouse", "width": 1}, {"from": "Clare of Assisi", "to": "Agatha of Sicily", "width": 1}, {"from": "Louis of Toulouse", "to": "Agatha of Sicily", "width": 1}, {"from": "Louis of Toulouse", "to": "John of Capistrano", "width": 1}, {"from": "Louis of Toulouse", "to": "James of the Marches", "width": 1}, {"from": "Agatha of Sicily", "to": "Michael", "width": 1}, {"from": "Agatha of Sicily", "to": "Anthony the Great", "width": 1}, {"from": "Agatha of Sicily", "to": "Bartholomew the Apostle", "width": 1}, {"from": "Agatha of Sicily", "to": "Saint Apollonia", "width": 1}, {"from": "Saint Dominic", "to": "Michael", "width": 1}, {"from": "Saint Dominic", "to": "Urban V", "width": 1}, {"from": "Saint Dominic", "to": "Anthony the Great", "width": 1}, {"from": "Saint Dominic", "to": "Saint Barbara", "width": 1}, {"from": "Saint Dominic", "to": "Beato Constancio de Fabriano", "width": 1}, {"from": "Michael", "to": "Urban V", "width": 1}, {"from": "Michael", "to": "Anthony the Great", "width": 1}, {"from": "Michael", "to": "Athanasios of Alexandria", "width": 1}, {"from": "Michael", "to": "Gabriel", "width": 1}, {"from": "Michael", "to": "Bartholomew the Apostle", "width": 1}, {"from": "Michael", "to": "Saint Apollonia", "width": 1}, {"from": "Michael", "to": "Ignatius of Antioch", "width": 1}, {"from": "Michael", "to": "Barnabas", "width": 1}, {"from": "Mark the Evangelist", "to": "Matthew the Apostle", "width": 1}, {"from": "Mark the Evangelist", "to": "Luke the Evangelist", "width": 1}, {"from": "Mark the Evangelist", "to": "John the Evangelist", "width": 1}, {"from": "St. James the Elder, Apostle", "to": "Lawrence of Rome", "width": 1}, {"from": "St. James the Elder, Apostle", "to": "Blaise of Sebaste", "width": 1}, {"from": "St. James the Elder, Apostle", "to": "Anthony the Great", "width": 1}, {"from": "St. James the Elder, Apostle", "to": "Saint Lucy", "width": 1}, {"from": "St. James the Elder, Apostle", "to": "Philip the Evangelist", "width": 1}, {"from": "Lawrence of Rome", "to": "Blaise of Sebaste", "width": 1}, {"from": "Lawrence of Rome", "to": "Anthony the Great", "width": 1}, {"from": "Lawrence of Rome", "to": "Saint Lucy", "width": 1}, {"from": "Lawrence of Rome", "to": "Philip the Evangelist", "width": 1}, {"from": "Lawrence of Rome", "to": "Saint Sebastian", "width": 1}, {"from": "Lawrence of Rome", "to": "Peter of Verona", "width": 1}, {"from": "Blaise of Sebaste", "to": "Anthony the Great", "width": 1}, {"from": "Blaise of Sebaste", "to": "Saint Lucy", "width": 1}, {"from": "Blaise of Sebaste", "to": "Philip the Evangelist", "width": 1}, {"from": "Anthony the Great", "to": "Saint Lucy", "width": 1}, {"from": "Anthony the Great", "to": "Philip the Evangelist", "width": 1}, {"from": "Anthony the Great", "to": "Saint Barbara", "width": 1}, {"from": "Anthony the Great", "to": "Bartholomew the Apostle", "width": 1}, {"from": "Anthony the Great", "to": "Saint Apollonia", "width": 1}, {"from": "Saint Lucy", "to": "Philip the Evangelist", "width": 1}, {"from": "Matthew the Apostle", "to": "Luke the Evangelist", "width": 1}, {"from": "Matthew the Apostle", "to": "John the Evangelist", "width": 1}, {"from": "Luke the Evangelist", "to": "John the Evangelist", "width": 1}, {"from": "John the Evangelist", "to": "Philip the Apostle", "width": 1}, {"from": "Saint Sebastian", "to": "Peter of Verona", "width": 1}, {"from": "Athanasios of Alexandria", "to": "Gabriel", "width": 1}, {"from": "Zachary", "to": "Elizabeth", "width": 1}, {"from": "Bartholomew the Apostle", "to": "Saint Apollonia", "width": 1}, {"from": "Ignatius of Antioch", "to": "Barnabas", "width": 1}, {"from": "John of Capistrano", "to": "James of the Marches", "width": 1}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "forceAtlas2Based": {
+            "avoidOverlap": 0,
+            "centralGravity": 0.01,
+            "damping": 0.4,
+            "gravitationalConstant": -50,
+            "springConstant": 0.08,
+            "springLength": 100
+        },
+        "solver": "forceAtlas2Based",
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>

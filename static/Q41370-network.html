@@ -1,0 +1,164 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 750;
+                 background-color: #222222;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"font": {"color": "white"}, "group": 0, "id": "Virgin Mary", "label": "Virgin Mary", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "group": 0, "id": "Moses", "label": "Moses", "shape": "dot", "size": 18}, {"font": {"color": "white"}, "group": 2, "id": "Peter", "label": "Peter", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "group": 0, "id": "David", "label": "David", "shape": "dot", "size": 23}, {"font": {"color": "white"}, "group": 2, "id": "John the Apostle", "label": "John the Apostle", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "group": 2, "id": "John the Baptist", "label": "John the Baptist", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "group": 2, "id": "Michael", "label": "Michael", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "group": 2, "id": "Saint George", "label": "Saint George", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "group": 2, "id": "Catherine of Alexandria", "label": "Catherine of Alexandria", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "group": 2, "id": "Saint Lucy", "label": "Saint Lucy", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "group": 2, "id": "Catherine of Siena", "label": "Catherine of Siena", "shape": "dot", "size": 10}, {"font": {"color": "white"}, "group": 0, "id": "Jonah", "label": "Jonah", "shape": "dot", "size": 2}, {"font": {"color": "white"}, "group": 1, "id": "Mark the Evangelist", "label": "Mark the Evangelist", "shape": "dot", "size": 8}, {"font": {"color": "white"}, "group": 1, "id": "Matthew the Apostle", "label": "Matthew the Apostle", "shape": "dot", "size": 8}, {"font": {"color": "white"}, "group": 1, "id": "Luke the Evangelist", "label": "Luke the Evangelist", "shape": "dot", "size": 8}, {"font": {"color": "white"}, "group": 1, "id": "John the Evangelist", "label": "John the Evangelist", "shape": "dot", "size": 8}, {"font": {"color": "white"}, "group": 1, "id": "John of Matha", "label": "John of Matha", "shape": "dot", "size": 8}, {"font": {"color": "white"}, "group": 1, "id": "Felix of Valois", "label": "Felix of Valois", "shape": "dot", "size": 8}, {"font": {"color": "white"}, "group": 1, "id": "Isaac", "label": "Isaac", "shape": "dot", "size": 8}, {"font": {"color": "white"}, "group": 0, "id": "Daniel", "label": "Daniel", "shape": "dot", "size": 1}, {"font": {"color": "white"}, "group": 0, "id": "Queen of Sheba", "label": "Queen of Sheba", "shape": "dot", "size": 1}, {"font": {"color": "white"}, "group": 0, "id": "Assumption of Mary", "label": "Assumption of Mary", "shape": "dot", "size": 1}, {"font": {"color": "white"}, "group": 0, "id": "Mary Magdalene", "label": "Mary Magdalene", "shape": "dot", "size": 1}, {"font": {"color": "white"}, "group": 0, "id": "Samuel", "label": "Samuel", "shape": "dot", "size": 1}]);
+                  edges = new vis.DataSet([{"from": "Virgin Mary", "to": "Moses", "width": 3}, {"from": "Virgin Mary", "to": "Peter", "width": 2}, {"from": "Virgin Mary", "to": "David", "width": 6}, {"from": "Virgin Mary", "to": "John the Apostle", "width": 2}, {"from": "Virgin Mary", "to": "John the Baptist", "width": 1}, {"from": "Virgin Mary", "to": "Michael", "width": 1}, {"from": "Virgin Mary", "to": "Saint George", "width": 1}, {"from": "Virgin Mary", "to": "Catherine of Alexandria", "width": 1}, {"from": "Virgin Mary", "to": "Saint Lucy", "width": 1}, {"from": "Virgin Mary", "to": "Catherine of Siena", "width": 1}, {"from": "Moses", "to": "Peter", "width": 2}, {"from": "Moses", "to": "David", "width": 7}, {"from": "Moses", "to": "John the Apostle", "width": 2}, {"from": "Moses", "to": "John the Baptist", "width": 2}, {"from": "Moses", "to": "Jonah", "width": 1}, {"from": "Moses", "to": "Mark the Evangelist", "width": 1}, {"from": "Moses", "to": "Matthew the Apostle", "width": 1}, {"from": "Moses", "to": "Luke the Evangelist", "width": 1}, {"from": "Moses", "to": "John the Evangelist", "width": 1}, {"from": "Moses", "to": "John of Matha", "width": 1}, {"from": "Moses", "to": "Felix of Valois", "width": 1}, {"from": "Moses", "to": "Isaac", "width": 1}, {"from": "Moses", "to": "Michael", "width": 1}, {"from": "Moses", "to": "Saint George", "width": 1}, {"from": "Moses", "to": "Catherine of Alexandria", "width": 1}, {"from": "Moses", "to": "Saint Lucy", "width": 1}, {"from": "Moses", "to": "Catherine of Siena", "width": 1}, {"from": "Peter", "to": "David", "width": 2}, {"from": "Peter", "to": "John the Apostle", "width": 2}, {"from": "Peter", "to": "John the Baptist", "width": 1}, {"from": "Peter", "to": "Michael", "width": 1}, {"from": "Peter", "to": "Saint George", "width": 1}, {"from": "Peter", "to": "Catherine of Alexandria", "width": 1}, {"from": "Peter", "to": "Saint Lucy", "width": 1}, {"from": "Peter", "to": "Catherine of Siena", "width": 1}, {"from": "David", "to": "John the Apostle", "width": 2}, {"from": "David", "to": "John the Baptist", "width": 2}, {"from": "David", "to": "Daniel", "width": 1}, {"from": "David", "to": "Queen of Sheba", "width": 1}, {"from": "David", "to": "Jonah", "width": 1}, {"from": "David", "to": "Mark the Evangelist", "width": 1}, {"from": "David", "to": "Matthew the Apostle", "width": 1}, {"from": "David", "to": "Luke the Evangelist", "width": 1}, {"from": "David", "to": "John the Evangelist", "width": 1}, {"from": "David", "to": "John of Matha", "width": 1}, {"from": "David", "to": "Felix of Valois", "width": 1}, {"from": "David", "to": "Isaac", "width": 1}, {"from": "David", "to": "Assumption of Mary", "width": 1}, {"from": "David", "to": "Michael", "width": 1}, {"from": "David", "to": "Saint George", "width": 1}, {"from": "David", "to": "Catherine of Alexandria", "width": 1}, {"from": "David", "to": "Saint Lucy", "width": 1}, {"from": "David", "to": "Catherine of Siena", "width": 1}, {"from": "David", "to": "Mary Magdalene", "width": 1}, {"from": "David", "to": "Samuel", "width": 1}, {"from": "John the Apostle", "to": "John the Baptist", "width": 1}, {"from": "John the Apostle", "to": "Michael", "width": 1}, {"from": "John the Apostle", "to": "Saint George", "width": 1}, {"from": "John the Apostle", "to": "Catherine of Alexandria", "width": 1}, {"from": "John the Apostle", "to": "Saint Lucy", "width": 1}, {"from": "John the Apostle", "to": "Catherine of Siena", "width": 1}, {"from": "John the Baptist", "to": "Michael", "width": 1}, {"from": "John the Baptist", "to": "Saint George", "width": 1}, {"from": "John the Baptist", "to": "Catherine of Alexandria", "width": 1}, {"from": "John the Baptist", "to": "Saint Lucy", "width": 1}, {"from": "John the Baptist", "to": "Catherine of Siena", "width": 1}, {"from": "Mark the Evangelist", "to": "Matthew the Apostle", "width": 1}, {"from": "Mark the Evangelist", "to": "Luke the Evangelist", "width": 1}, {"from": "Mark the Evangelist", "to": "John the Evangelist", "width": 1}, {"from": "Mark the Evangelist", "to": "John of Matha", "width": 1}, {"from": "Mark the Evangelist", "to": "Felix of Valois", "width": 1}, {"from": "Mark the Evangelist", "to": "Isaac", "width": 1}, {"from": "Matthew the Apostle", "to": "Luke the Evangelist", "width": 1}, {"from": "Matthew the Apostle", "to": "John the Evangelist", "width": 1}, {"from": "Matthew the Apostle", "to": "John of Matha", "width": 1}, {"from": "Matthew the Apostle", "to": "Felix of Valois", "width": 1}, {"from": "Matthew the Apostle", "to": "Isaac", "width": 1}, {"from": "Luke the Evangelist", "to": "John the Evangelist", "width": 1}, {"from": "Luke the Evangelist", "to": "John of Matha", "width": 1}, {"from": "Luke the Evangelist", "to": "Felix of Valois", "width": 1}, {"from": "Luke the Evangelist", "to": "Isaac", "width": 1}, {"from": "John the Evangelist", "to": "John of Matha", "width": 1}, {"from": "John the Evangelist", "to": "Felix of Valois", "width": 1}, {"from": "John the Evangelist", "to": "Isaac", "width": 1}, {"from": "John of Matha", "to": "Felix of Valois", "width": 1}, {"from": "John of Matha", "to": "Isaac", "width": 1}, {"from": "Felix of Valois", "to": "Isaac", "width": 1}, {"from": "Michael", "to": "Saint George", "width": 1}, {"from": "Michael", "to": "Catherine of Alexandria", "width": 1}, {"from": "Michael", "to": "Saint Lucy", "width": 1}, {"from": "Michael", "to": "Catherine of Siena", "width": 1}, {"from": "Saint George", "to": "Catherine of Alexandria", "width": 1}, {"from": "Saint George", "to": "Saint Lucy", "width": 1}, {"from": "Saint George", "to": "Catherine of Siena", "width": 1}, {"from": "Catherine of Alexandria", "to": "Saint Lucy", "width": 1}, {"from": "Catherine of Alexandria", "to": "Catherine of Siena", "width": 1}, {"from": "Saint Lucy", "to": "Catherine of Siena", "width": 1}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "forceAtlas2Based": {
+            "avoidOverlap": 0,
+            "centralGravity": 0.01,
+            "damping": 0.4,
+            "gravitationalConstant": -50,
+            "springConstant": 0.08,
+            "springLength": 100
+        },
+        "solver": "forceAtlas2Based",
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>

@@ -1,0 +1,55 @@
+{%extends "base.html"%}
+{%block title%} Saint analysis WebUI {%endblock%}
+
+
+{% block content %}
+<div class="container">
+    <h1>Corpus information</h1>
+    <div class="row">
+        <div class="col">
+            Number of objects = {{num_artworks}}
+        </div>
+        <div class="col">
+            Number of saints = {{num_saints}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <p><a href="/corpus/network" target="_self" class="btn btn-outline-primary btn-lg btn-block corpus">See network</a></p>
+        </div>
+    </div>
+    <div class="row">
+        <h1 class="text-center">Network data:</h1>
+    </div>
+    <div class="row">
+        <div class="col">
+            <iframe src="/static/corpus-degcent.html" height="500" width="100%"></iframe>
+        </div>
+        <div class="col">
+            <iframe src="/static/corpus-clocent.html" height="500" width="100%"></iframe>
+        </div>
+        <div class="col">
+            <iframe src="/static/corpus-betwcent.html" height="500" width="100%"></iframe>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <h1 class="text-center">Year Distribution</h1>
+    <div class="row">
+        <div class='col'>
+            <iframe src="/static/corpus-histo.html" height="500" width="100%"></iframe>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <h1 class="text-center my-4">Saints</h1>
+    <div class="row">
+        {%for s in saints%}
+        <div class="col-sm-4">
+            <p><a href="/saint/{{s[0]}}" target="_self" class="btn btn-outline-primary btn-lg btn-block corpus">{{s[1]}} (depicted {{s[2]}} times)</a></p>
+        </div>
+        {%endfor%}
+    </div>
+</div>
+{% endblock %}

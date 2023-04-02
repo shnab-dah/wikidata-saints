@@ -1,0 +1,50 @@
+{%extends "base.html"%}
+{%block title%} Saint: {{name}}{%endblock%}
+
+{% block content %}
+<div class="container">
+    <h1>{{name}}</h1>
+    <div class="row">
+        <div class="col">
+            <a href="{{url}}" target="_blank" class="btn btn-outline-primary btn-lg btn-block">Data source</a>
+        </div>\
+    </div>
+    <div class="row">
+        <h1 class="text-center">Network:</h1>
+    </div>
+    <div class="row">
+        <iframe src="/static/{{qid}}-network.html" height="800" width="100%"></iframe>
+    </div>
+    <div class="row">
+        <div class="col">
+            <iframe src="/static/{{qid}}-degcent.html" height="500" width="100%"></iframe>
+        </div>
+        <div class="col">
+            <iframe src="/static/{{qid}}-clocent.html" height="500" width="100%"></iframe>
+        </div>
+        <div class="col">
+            <iframe src="/static/{{qid}}-betwcent.html" height="500" width="100%"></iframe>
+        </div>
+    </div>
+    <div class="row">
+        <h1 class="text-center">Corpus data:</h1>
+    </div>
+    <div class="row">
+        <div class='col'>
+            <iframe src="/static/{{qid}}-histo.html" height="500" width="100%"></iframe>
+        </div>
+    </div>
+
+</div>
+<div class="container">
+    <h1 class="text-center my-4">Appears on:</h1>
+    <div class="row">
+         {%for a in objs%}
+        <div class="col-sm-4">
+            <p><a href="/artwork/{{a[0]}}" target="_self" class="btn btn-outline-primary btn-lg btn-block corpus">
+                {{a[1]}} ({{a[2]}})</a></p>
+        </div>
+        {%endfor%}
+    </div>
+</div>
+{% endblock %}

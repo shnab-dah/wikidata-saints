@@ -1,9 +1,7 @@
-import matplotlib.pyplot as plt
 import networkx as nx
-from corpus import Corpus
-from pyvis.network import Network
+import pandas as pd
 import community as community_louvain
-import numpy as np
+import plotly.express as px
 
 
 class Saint:
@@ -20,27 +18,13 @@ class Saint:
         self.gender = ''
 
     def plot_histogram(self):
-        f = plt.figure()
         dates = [artwork.date for artwork in self.artworks]
-        years = []
-        for date in dates:
-            date = date.split('-')
-            years.append(int(date[0]))
-        years.sort()
-        # bins by Fred-Diacconis rule
-        if len(years) > 10:
-            # some entries create errors -> therefore except clause
-            try:
-                q25, q75 = np.percentile(years, [25, 75])
-                bin_width = 2 * (q25 - q75) * len(years) ** (-1 / 3)
-                bins = round((years[0] - years[len(years) - 1]) / bin_width)
-            except:
-                bins = 10
-        else:
-            bins = 10
-        plt.hist(years, density=False, bins=bins, figure=f)
-        f.suptitle(f'Year frequency of {self.name}')
-        return f
+        dates.sort()
+        df = pd.DataFrame(dates, columns=['year'])
+        fig = px.histogram(df, x='year', marginal='rug')
+        fig.update_layout(xaxis_title=None)
+        fig.update_layout(yaxis_title=None)
+        return fig
 
     def build_network(self):
         G = nx.Graph()
@@ -63,16 +47,4 @@ class Saint:
         nx.set_node_attributes(G, node_degree, 'size')
         communities = community_louvain.best_partition(G)
         nx.set_node_attributes(G, communities, 'group')
-        G2 = Network(width='1500px', height='1000px', bgcolor='#222222', font_color='white', select_menu=True)
-        G2.from_nx(G)
-        G2.force_atlas_2based()
-        return G2
-
-
-if __name__ == "__main__":
-    x = Corpus()
-    z = []
-    for saint in x.saints.values():
-        z.append(saint)
-    for saint in z[:10]:
-        saint.build_network()
+        return G
