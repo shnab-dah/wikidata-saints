@@ -12,6 +12,9 @@
         <div class="col">
             Number of saints = {{num_saints}}
         </div>
+        <div class="col">
+            Dataset queried: {{date}}
+        </div>
     </div>
     <div class="row">
         <div class="col">
@@ -19,7 +22,18 @@
         </div>
     </div>
     <div class="row">
-        <h1 class="text-center">Network data:</h1>
+        <div class="col">
+            <p>Clustering coefficient: {{clustering}}</p>
+        </div>
+        <div class="col">
+            <p>Density: {{density}}</p>
+        </div>
+        <div class="col">
+            <p>Modularity: {{modularity}}</p>
+        </div>
+    </div>
+    <div class="row">
+        <h1 class="text-center">Network data</h1>
     </div>
     <div class="row">
         <div class="col">
@@ -40,16 +54,14 @@
             <iframe src="/static/corpus-histo.html" height="500" width="100%"></iframe>
         </div>
     </div>
-</div>
-
-<div class="container">
-    <h1 class="text-center my-4">Saints</h1>
     <div class="row">
-        {%for s in saints%}
-        <div class="col-sm-4">
-            <p><a href="/saint/{{s[0]}}" target="_self" class="btn btn-outline-primary btn-lg btn-block corpus">{{s[1]}} (depicted {{s[2]}} times)</a></p>
+        <h1 class="text-center">Other corpus information</h1>
+    </div>
+    <div class="row">
+        <div class="col">
+            <iframe src="/static/corpus-typefreq.html" height="500" width="100%"></iframe>
         </div>
-        {%endfor%}
     </div>
 </div>
+
 {% endblock %}
