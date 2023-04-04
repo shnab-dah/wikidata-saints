@@ -3,14 +3,30 @@
 
 {% block content %}
 <div class="container">
-    <h1>{{name}}</h1>
+    <h1 class="text-center">{{name}}</h1>
     <div class="row">
         <div class="col">
             <a href="{{url}}" target="_blank" class="btn btn-outline-primary btn-lg btn-block">Data source</a>
-        </div>\
+        </div>
+        <div class="col">
+            <a href="/saint/{{qid}}/network_progression" target="_blank" class="btn btn-outline-primary btn-lg btn-block">Network progression</a>
+        </div>
     </div>
     <div class="row">
-        <h1 class="text-center">Network:</h1>
+        <div class="col">
+            <h1 class="text-center">Network (corpus: objects depicting {{name}})</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <p>Clustering coefficient: {{clustering}}</p>
+        </div>
+        <div class="col">
+            <p>Density: {{density}}</p>
+        </div>
+        <div class="col">
+            <p>Modularity: {{modularity}}</p>
+        </div>
     </div>
     <div class="row">
         <iframe src="/static/{{qid}}-network.html" height="800" width="100%"></iframe>
@@ -27,17 +43,31 @@
         </div>
     </div>
     <div class="row">
-        <h1 class="text-center">Corpus data:</h1>
+        <h1 class="text-center">Corpus data</h1>
     </div>
     <div class="row">
         <div class='col'>
             <iframe src="/static/{{qid}}-histo.html" height="500" width="100%"></iframe>
         </div>
     </div>
+    <div class="row">
+        <h1 class="text-center">Centrality progressions over time in total corpus network</h1>
+    </div>
+    <div class="row">
+        <div class="col">
+            <iframe src="/static/{{qid}}-evolution-degree.html" height="500" width="100%"></iframe>
+        </div>
+        <div class="col">
+            <iframe src="/static/{{qid}}-evolution-closeness.html" height="500" width="100%"></iframe>
+        </div>
+        <div class="col">
+            <iframe src="/static/{{qid}}-evolution-betweenness.html" height="500" width="100%"></iframe>
+        </div>
+    </div>
 
 </div>
 <div class="container">
-    <h1 class="text-center my-4">Appears on:</h1>
+    <h1 class="text-center my-4">Appears on</h1>
     <div class="row">
          {%for a in objs%}
         <div class="col-sm-4">

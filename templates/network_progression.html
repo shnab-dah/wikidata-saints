@@ -1,0 +1,43 @@
+{%extends "base.html"%}
+{%block title%} Network progression of {{name}}  {%endblock%}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1 class="text-center">Network progression of {{name}}</h1>
+            </div>
+        </div>
+        {% for range in ranges %}
+            <div class="row">
+                <h1 class="text-center">{{range['start']}} - {{range['end']}}</h1>
+            </div>
+            <div class="row">
+                <iframe src="/static/{{qid}}-{{range['start']}}-{{range['end']}}-network.html" height="800"
+                        width="100%"></iframe>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <p>Clustering coefficient: {{range['clustering']}}</p>
+                </div>
+                <div class="col">
+                    <p>Density: {{range['density']}}</p>
+                </div>
+                <div class="col">
+                    <p>Modularity: {{range['modularity']}}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <iframe src="/static/{{qid}}-{{range['start']}}-{{range['end']}}-degree.html" height="500" width="100%"></iframe>
+                </div>
+                <div class="col">
+                    <iframe src="/static/{{qid}}-{{range['start']}}-{{range['end']}}-closeness.html" height="500" width="100%"></iframe>
+                </div>
+                <div class="col">
+                    <iframe src="/static/{{qid}}-{{range['start']}}-{{range['end']}}-betweenness.html" height="500" width="100%"></iframe>
+                </div>
+            </div>
+                {% endfor %}
+    </div>
+{% endblock %}

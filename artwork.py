@@ -5,16 +5,21 @@ class Artwork:
         self.QID = data.name
         self.objectvalue = data['object.value']
         date = data['dates.value']
-        date = date.split('-')
-        self.date = int(date[0])
+        if 'http' in date or date == '':
+            self.dated = False
+            self.date = 'Undated'
+        else:
+            date = date.split('-')
+            self.date = int(date[0])
+            self.dated = True
         self.creators = str(data['creators.value']).split(';')
         self.depictions = str(data['depictions.value']).split(';')
         self.images = str(data['images.value']).split(';')
-        self.collection = str(data['collection.value']).split(';')
+        self.collection = str(data['collections.value']).split(';')
         self.genres = str(data['genres.value']).split(';')
         self.materials = str(data['materials.value']).split(';')
         self.types = str(data['types.value']).split(';')
-        self.creationPlace = str(data['creationPlace.value']).split(';')
+        self.creationPlace = str(data['creationlocations.value']).split(';')
 
         if len(self.images) < 1:
             self.images = ['https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg']
