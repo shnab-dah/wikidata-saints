@@ -2,6 +2,7 @@ import pandas as pd
 from SPARQLWrapper import SPARQLWrapper, JSON
 import time
 
+
 def update_data():
     get_saints().to_json('./data/saints.json')
 

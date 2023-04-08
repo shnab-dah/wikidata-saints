@@ -2,7 +2,6 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from pyvis.network import Network
 from SPARQLWrapper import SPARQLWrapper, JSON
 from artwork import Artwork
 from saint import Saint
@@ -11,7 +10,7 @@ import plotly.express as px
 import time
 from wikidata.client import Client
 import multiprocessing
-import tqdm.auto as tqdm
+
 
 class Corpus:
     def __init__(self, localdata=False):
@@ -29,7 +28,7 @@ class Corpus:
             self.saintnames[QID] = self.sdf['name.value'].loc[QID]
 
         # query wikidata for objects
-        if localdata == False:
+        if not localdata:
             self.odf = self.query()
             querytime = time.time()
             time_struct = time.localtime(querytime)
@@ -162,7 +161,7 @@ class Corpus:
             connections = []
             for connection in saint.connections:
                 artwork = connection[1]
-                connection = connection [0]
+                connection = connection[0]
                 inverse = (connection[1], connection[0])
                 if inverse in connections:
                     connections.append((inverse, artwork))
@@ -316,14 +315,14 @@ class Corpus:
         closeness_cent.update_layout(yaxis_title=None)
 
         df = pd.DataFrame(dict(x=years, y=betwenness_cent))
-        betweennes_cent = px.line(df, x="x", y="y", title=f"Betweenness centrality over time of {s}")
-        betweennes_cent.update_layout(xaxis_title=None)
-        betweennes_cent.update_layout(yaxis_title=None)
+        betweenness_cent = px.line(df, x="x", y="y", title=f"Betweenness centrality over time of {s}")
+        betweenness_cent.update_layout(xaxis_title=None)
+        betweenness_cent.update_layout(yaxis_title=None)
 
         dic = {
             'degree': degree_cent,
             'closeness': closeness_cent,
-            'betweenness': betweennes_cent
+            'betweenness': betweenness_cent
         }
 
         return dic
@@ -378,6 +377,7 @@ class Corpus:
 
         return fig
 
+
 if __name__ == "__main__":
     corp = Corpus(localdata=True)
 
@@ -391,16 +391,14 @@ if __name__ == "__main__":
     jaccard_matrix = np.zeros((n, n))
     for i in range(len(graphs)):
         for j in range(i + 1, len(graphs)):
-            for i in range(len(graphs)):
-                for j in range(i + 1, len(graphs)):
-                    intersection_size = len(set(graphs[i].edges()) & set(graphs[j].edges()))
-                    union_size = len(set(graphs[i].edges()) | set(graphs[j].edges()))
-                    jaccard_similarity = intersection_size / union_size if union_size != 0 else 0
-                    jaccard_matrix[i][j] = jaccard_similarity
-                    jaccard_matrix[j][i] = jaccard_similarity
+            intersection_size = len(set(graphs[i].edges()) & set(graphs[j].edges()))
+            union_size = len(set(graphs[i].edges()) | set(graphs[j].edges()))
+            jaccard_similarity = intersection_size / union_size if union_size != 0 else 0
+            jaccard_matrix[i][j] = jaccard_similarity
+            jaccard_matrix[j][i] = jaccard_similarity
 
     et = time.time()
     plt.imshow(jaccard_matrix, cmap='hot', interpolation='nearest')
     plt.colorbar()
     plt.show()
-    print(f'Calculation time: {et-st} seconds')
+    print(f'Calculation time: {et - st} seconds')

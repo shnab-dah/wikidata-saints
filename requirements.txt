@@ -1,0 +1,10 @@
+networkx~=3.1
+pandas~=2.0.0
+numpy~=1.24.2
+SPARQLWrapper~=2.0.0
+Wikidata~=0.7.0
+plotly~=5.14.1
+pyvis~=0.3.2
+matplotlib~=3.7.1
+python-louvain~=0.16
+Flask~=2.2.3
