@@ -127,6 +127,7 @@ class Saint:
             G2.force_atlas_2based()
             graphs.append({
                 'G': G2,
+                'nx': G,
                 'start': start,
                 'end': end,
                 'degree': fig1,

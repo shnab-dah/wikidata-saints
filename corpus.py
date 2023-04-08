@@ -1,5 +1,7 @@
 import networkx as nx
+import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from pyvis.network import Network
 from SPARQLWrapper import SPARQLWrapper, JSON
 from artwork import Artwork
@@ -9,6 +11,7 @@ import plotly.express as px
 import time
 from wikidata.client import Client
 import multiprocessing
+import tqdm.auto as tqdm
 
 class Corpus:
     def __init__(self, localdata=False):
@@ -377,9 +380,27 @@ class Corpus:
 
 if __name__ == "__main__":
     corp = Corpus(localdata=True)
-    saints = [saint for saint in corp.saints.values()]
-    for saint in saints[:20]:
-        print(saint.yearranges())
 
+    progression = corp.network_progression()
+    graphs = []
+    for rg in progression:
+        graphs.append(rg['nx'])
+    st = time.time()
+    # Create an empty matrix to store the Jaccard similarity scores
+    n = len(graphs)
+    jaccard_matrix = np.zeros((n, n))
+    for i in range(len(graphs)):
+        for j in range(i + 1, len(graphs)):
+            for i in range(len(graphs)):
+                for j in range(i + 1, len(graphs)):
+                    intersection_size = len(set(graphs[i].edges()) & set(graphs[j].edges()))
+                    union_size = len(set(graphs[i].edges()) | set(graphs[j].edges()))
+                    jaccard_similarity = intersection_size / union_size if union_size != 0 else 0
+                    jaccard_matrix[i][j] = jaccard_similarity
+                    jaccard_matrix[j][i] = jaccard_similarity
 
-
+    et = time.time()
+    plt.imshow(jaccard_matrix, cmap='hot', interpolation='nearest')
+    plt.colorbar()
+    plt.show()
+    print(f'Calculation time: {et-st} seconds')
