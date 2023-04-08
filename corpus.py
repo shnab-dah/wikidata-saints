@@ -327,13 +327,12 @@ class Corpus:
 
         return dic
 
-    def get_labels(self, qids):
+    def get_labels(self, qid):
         dict = {}
         client = Client()
-        for qid in qids:
-            entity = client.get(qid)
-            label = entity.label
-            dict[qid] = str(label)
+        entity = client.get(qid)
+        label = entity.label
+        dict[qid] = str(label)
         return dict
 
     def type_frequency(self):
@@ -351,15 +350,12 @@ class Corpus:
         uniques = uniques[0:10]
         qids = [qid[0] for qid in uniques]
         # limitation of wikidata query
-        chunk_size = 5
-        chunks = [qids[i:i + chunk_size] for i in range(0, len(qids), chunk_size)]
-        pool = multiprocessing.Pool()
-        st = time.time()
-        results = pool.map(self.get_labels, chunks)
+        with multiprocessing.Pool(processes=5) as pool:
+            labels = pool.map(self.get_labels, qids)
+
         dictionary = {}
-        for d in results:
+        for d in labels:
             dictionary.update(d)
-        et = time.time()
         freq_dict = {}
         for tup in uniques:
             freq_dict[dictionary[tup[0]]] = tup[1]
@@ -379,26 +375,6 @@ class Corpus:
 
 
 if __name__ == "__main__":
-    corp = Corpus(localdata=True)
-
-    progression = corp.network_progression()
-    graphs = []
-    for rg in progression:
-        graphs.append(rg['nx'])
-    st = time.time()
-    # Create an empty matrix to store the Jaccard similarity scores
-    n = len(graphs)
-    jaccard_matrix = np.zeros((n, n))
-    for i in range(len(graphs)):
-        for j in range(i + 1, len(graphs)):
-            intersection_size = len(set(graphs[i].edges()) & set(graphs[j].edges()))
-            union_size = len(set(graphs[i].edges()) | set(graphs[j].edges()))
-            jaccard_similarity = intersection_size / union_size if union_size != 0 else 0
-            jaccard_matrix[i][j] = jaccard_similarity
-            jaccard_matrix[j][i] = jaccard_similarity
-
-    et = time.time()
-    plt.imshow(jaccard_matrix, cmap='hot', interpolation='nearest')
-    plt.colorbar()
-    plt.show()
-    print(f'Calculation time: {et - st} seconds')
+    multiprocessing.freeze_support()
+    corp = Corpus()
+    corp.typechart.show()

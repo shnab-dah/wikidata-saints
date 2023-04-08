@@ -107,4 +107,4 @@ def get_saints():
 
 
 if __name__ == "__main__":
-    pass
+    update_data()
