@@ -4,7 +4,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from SPARQLWrapper import SPARQLWrapper, JSON
 from pyvis.network import Network
-import tqdm.auto as tqdm
 from artwork import Artwork
 from saint import Saint
 import community as community_louvain
