@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from SPARQLWrapper import SPARQLWrapper, JSON
+from pyvis.network import Network
+
 from artwork import Artwork
 from saint import Saint
 import community as community_louvain
@@ -10,6 +12,7 @@ import plotly.express as px
 import time
 from wikidata.client import Client
 import multiprocessing
+import query_types as qt
 
 
 class Corpus:
@@ -51,7 +54,7 @@ class Corpus:
         self.network_snapshots = self.network_progression()
         self.network = self.main_network()
 
-        self.typechart = self.type_frequency()
+        # self.typechart = self.type_frequency()
 
     def query(self):
         # endpoint wikidata
@@ -327,14 +330,6 @@ class Corpus:
 
         return dic
 
-    def get_labels(self, qid):
-        dict = {}
-        client = Client()
-        entity = client.get(qid)
-        label = entity.label
-        dict[qid] = str(label)
-        return dict
-
     def type_frequency(self):
         artwork_types = [artwork.types for artwork in self.artworks.values()]
         freq = {}
@@ -350,9 +345,7 @@ class Corpus:
         uniques = uniques[0:10]
         qids = [qid[0] for qid in uniques]
         # limitation of wikidata query
-        with multiprocessing.Pool(processes=5) as pool:
-            labels = pool.map(self.get_labels, qids)
-
+        labels = qt.get_labels(qids)
         dictionary = {}
         for d in labels:
             dictionary.update(d)
@@ -377,4 +370,8 @@ class Corpus:
 if __name__ == "__main__":
     multiprocessing.freeze_support()
     corp = Corpus()
-    corp.typechart.show()
+    G = corp.network
+    G2 = Network(width='100%', height='750', bgcolor='#222222', font_color='white')
+    G2.from_nx(G)
+    G2.force_atlas_2based()
+    G2.show('corpus-network.html', notebook=False)
