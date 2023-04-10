@@ -1,3 +1,5 @@
+import multiprocessing
+
 import community
 import community as community_louvain
 import networkx as nx
@@ -170,4 +172,5 @@ def artwork(a):
 
 
 if __name__ == '__main__':
+    multiprocessing.freeze_support()
     app.run(debug=False)

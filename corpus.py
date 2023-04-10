@@ -12,7 +12,6 @@ import plotly.express as px
 import time
 from wikidata.client import Client
 import multiprocessing
-import query_types as qt
 
 
 class Corpus:
@@ -54,7 +53,7 @@ class Corpus:
         self.network_snapshots = self.network_progression()
         self.network = self.main_network()
 
-        # self.typechart = self.type_frequency()
+        self.typechart = self.type_frequency()
 
     def query(self):
         # endpoint wikidata
@@ -345,9 +344,12 @@ class Corpus:
         uniques = uniques[0:10]
         qids = [qid[0] for qid in uniques]
         # limitation of wikidata query
-        labels = qt.get_labels(qids)
+        returns = []
+        with multiprocessing.Pool(processes=5) as pool:
+            returns = pool.map(self.query_label, qids)
+
         dictionary = {}
-        for d in labels:
+        for d in returns:
             dictionary.update(d)
         freq_dict = {}
         for tup in uniques:
@@ -366,12 +368,16 @@ class Corpus:
 
         return fig
 
+    def query_label(self, qid):
+        dict = {}
+        client = Client()
+        entity = client.get(qid)
+        label = entity.label
+        dict[qid] = str(label)
+        return dict
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
     corp = Corpus()
-    G = corp.network
-    G2 = Network(width='100%', height='750', bgcolor='#222222', font_color='white')
-    G2.from_nx(G)
-    G2.force_atlas_2based()
-    G2.show('corpus-network.html', notebook=False)
+    fig = corp.typechart
+    fig.show()
