@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from SPARQLWrapper import SPARQLWrapper, JSON
 from pyvis.network import Network
-
+import tqdm.auto as tqdm
 from artwork import Artwork
 from saint import Saint
 import community as community_louvain
@@ -12,6 +12,7 @@ import plotly.express as px
 import time
 from wikidata.client import Client
 import multiprocessing
+import functionality as func
 
 
 class Corpus:
@@ -126,7 +127,7 @@ class Corpus:
             # update some vars
             saint.frequency = len(saint.artworks)
             saint.name = self.saintnames[saint.QID]
-
+            saint.artworks = sorted(saint.artworks, key=func.get_date)
             saint.gender = self.sdf['gender.value'].loc[saint.QID]
             if saint.gender != 'male' and saint.gender != 'female':
                 saint.gender = "undefined"
@@ -307,19 +308,13 @@ class Corpus:
                 years.append(graph['end'])
 
         df = pd.DataFrame(dict(x=years, y=degree_cent))
-        degree_cent = px.line(df, x="x", y="y", title=f"Degree centrality over time of {s}")
-        degree_cent.update_layout(xaxis_title=None)
-        degree_cent.update_layout(yaxis_title=None)
+        degree_cent = func.set_axes(px.line(df, x="x", y="y", title=f"Degree centrality over time of {s}"))
 
         df = pd.DataFrame(dict(x=years, y=closeness_cent))
-        closeness_cent = px.line(df, x="x", y="y", title=f"Closeness centrality over time of {s}")
-        closeness_cent.update_layout(xaxis_title=None)
-        closeness_cent.update_layout(yaxis_title=None)
+        closeness_cent = func.set_axes(px.line(df, x="x", y="y", title=f"Closeness centrality over time of {s}"))
 
         df = pd.DataFrame(dict(x=years, y=betwenness_cent))
-        betweenness_cent = px.line(df, x="x", y="y", title=f"Betweenness centrality over time of {s}")
-        betweenness_cent.update_layout(xaxis_title=None)
-        betweenness_cent.update_layout(yaxis_title=None)
+        betweenness_cent = func.set_axes(px.line(df, x="x", y="y", title=f"Betweenness centrality over time of {s}"))
 
         dic = {
             'degree': degree_cent,
@@ -334,8 +329,7 @@ class Corpus:
         freq = {}
         for obj in artwork_types:
             for typ in obj:
-                typ = typ.split('/')
-                typ = typ[4]
+                typ = func.filter_QID(typ)
                 if typ in freq:
                     freq[typ] += 1
                 else:
@@ -343,8 +337,7 @@ class Corpus:
         uniques = sorted(freq.items(), key=lambda x: x[1], reverse=True)
         uniques = uniques[0:10]
         qids = [qid[0] for qid in uniques]
-        # limitation of wikidata query
-        returns = []
+
         with multiprocessing.Pool(processes=5) as pool:
             returns = pool.map(self.query_label, qids)
 
@@ -362,11 +355,7 @@ class Corpus:
         df = pd.DataFrame({'Type': list(sorted_dict.keys()), 'Count': list(sorted_dict.values())})
 
         # create bar chart
-        fig = px.bar(df, x='Type', y='Count', title='Type frequency in corpus')
-        fig.update_layout(xaxis_title=None)
-        fig.update_layout(yaxis_title=None)
-
-        return fig
+        return func.set_axes(px.bar(df, x='Type', y='Count', title='Type frequency in corpus'))
 
     def query_label(self, qid):
         dict = {}
@@ -377,7 +366,8 @@ class Corpus:
         return dict
 
 if __name__ == "__main__":
-    multiprocessing.freeze_support()
-    corp = Corpus()
-    fig = corp.typechart
-    fig.show()
+    corp = Corpus(localdata=True)
+    saints = [saint for saint in corp.saints.values()]
+    for saint in saints:
+       years = [artwork.date for artwork in saint.artworks]
+       print(years)

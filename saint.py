@@ -26,9 +26,8 @@ class Saint:
         dates = [artwork.date for artwork in self.artworks if artwork.dated]
         dates.sort()
         df = pd.DataFrame(dates, columns=['year'])
-        fig = px.histogram(df, x='year', marginal='rug', title='Depictions over time')
-        fig.update_layout(xaxis_title=None)
-        fig.update_layout(yaxis_title=None)
+        fig = func.set_axes(px.histogram(df, x='year', marginal='rug', title='Depictions over time'))
+
         return fig
 
     def build_network(self):
@@ -99,7 +98,8 @@ class Saint:
             nx.set_node_attributes(G, communities, 'group')
 
             try:
-                clustering, density, modularity = nx.average_clustering(G), nx.density(G), community_louvain.modularity(communities, G)
+                clustering, density, modularity = nx.average_clustering(G), nx.density(G), \
+                    community_louvain.modularity(communities, G)
             except:
                 clustering, density, modularity = 0, 0, 0
 

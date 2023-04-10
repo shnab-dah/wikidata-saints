@@ -1,4 +1,4 @@
-from wikidata.client import Client
+import functionality as func
 
 class Artwork:
     def __init__(self, data):
@@ -20,41 +20,34 @@ class Artwork:
         self.materials = str(data['materials.value']).split(';')
         self.types = str(data['types.value']).split(';')
         self.creationPlace = str(data['creationlocations.value']).split(';')
-
-        if len(self.images) < 1:
+        self.hasimage = True
+        if self.images == ['']:
+            self.hasimage = False
             self.images = ['https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg']
 
-    def get_english(self):
-        client = Client()
-        materials_eng = []
-        entity = client.get(self.QID, load=True)
-        name = entity.label
-        try:
-            if isinstance(self.materials, list):
-                for mat in self.materials:
-                    entity = client.get(self.filter_QID(mat), load=True)
-                    materials_eng.append(entity.label)
-        except:
-            materials_eng.append('No data')
-        institute = []
-        try:
-            if isinstance(self.collection, list):
-                for col in self.collection:
-                    entity = client.get(self.filter_QID(col), load=True)
-                    institute.append(entity.label)
-        except:
-            institute.append('No data')
-        creators = []
-        try:
-            if isinstance(self.creators, list):
-                for cre in self.creators:
-                    entity = client.get(self.filter_QID(cre))
-                    creators.append(entity.label)
-        except:
-            creators.append('No data')
-        return name, materials_eng, institute, creators
+    def list_info(self):
+        name = func.query_label(self.QID)
+        creators = func.query_list(self.creators)
 
+        return {
+            'creators': creators,
+            'title': name,
+            'date': str(self.date),
+            'images': self.images,
+            'data_source': self.objectvalue
+        }
 
-    def filter_QID(self, string):
-        string = string.split('/')
-        return string[4]
+    def info(self):
+        name = func.query_label(self.QID)
+        creators = func.query_list(self.creators)
+        materials = func.query_list(self.materials)
+        collection = func.query_list(self.collection)
+        return {
+            'creators': creators,
+            'title': name,
+            'date': str(self.date),
+            'images': self.images,
+            'data_source': self.objectvalue,
+            'materials': materials,
+            'collection': collection
+        }

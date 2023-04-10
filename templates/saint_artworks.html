@@ -1,0 +1,46 @@
+{%extends "base.html"%}
+{%block title%} Artworks with: {{name}} ({{page}}) {%endblock%}
+
+{% block content %}
+    <div class="container">
+        <h1 class="text-center">Images of {{name}} (page {{page}})</h1>
+    </div>
+    <div class="container">
+        {% for num in range(1, num_pages+1) %}
+            {% if num == current_page %}
+                <span>{{ num }}</span>
+            {% else %}
+                <a href="/saint/{{qid}}/images/{{num}}">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+        <a href="/saint/{{qid}}/image_dump">See image dump</a>
+    </div>
+    {% for obj in artworks %}
+        <div class="container">
+            <div class="row">
+                {% for img_url in obj['images'] %}
+                    <div class="col">
+                        <img src="{{img_url}}" alt="Image description" style ="max-width: 100%; max-height: 750px">
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="row">
+                <div class="col">
+                    <p>
+                        {{obj['creators']}}, <i>{{obj['title']}}</i>, {{obj['date']}} <a href="{{obj['data_source']}}">(data source)</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    <div class="container">
+        {% for num in range(1, num_pages+1) %}
+            {% if num == current_page %}
+                <span>{{ num }}</span>
+            {% else %}
+                <a href="/saint/{{qid}}/images/{{num}}">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+        <a href="/saint/{{qid}}/image_dump">See image dump</a>
+    </div>
+{% endblock %}

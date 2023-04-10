@@ -8,11 +8,18 @@ from plotly.offline import plot
 from pyvis.network import Network
 import functionality as func
 from corpus import Corpus
+import os
+
 
 corp = Corpus()
 pd.options.plotting.backend = 'plotly'
 app = Flask('Saint analysis')
 
+
+def clean_temp():
+    for filename in os.listdir('./static/temp'):
+        file_path = os.path.join('./static/temp', filename)
+        os.remove(file_path)
 
 @app.route('/')
 def home():
@@ -82,10 +89,13 @@ def saint_page(s):
     artworks = []
     G = s.build_network()
     # network data
-    clustering = nx.average_clustering(G)
-    density = nx.density(G)
-    partition = community_louvain.best_partition(G)
-    modularity = community_louvain.modularity(partition, G)
+    try:
+        clustering = nx.average_clustering(G)
+        density = nx.density(G)
+        partition = community_louvain.best_partition(G)
+        modularity = community_louvain.modularity(partition, G)
+    except:
+        clustering, density, partition, modularity = 0, 0, 0, 0
 
     # plot network
     G2 = Network(width='100%', height='750', bgcolor='#222222', font_color='white')
@@ -143,33 +153,38 @@ def network_progression(s):
     return render_template('network_progression.html', ranges=ranges, name=s.name, qid=qid)
 
 
+@app.route('/saint/<qid>/images/<int:page>')
+def saint_images(qid, page):
+    s = corp.QIDsaints[qid]
+    items_per_page = 20
+    start_index = (page - 1) * items_per_page
+    end_index = start_index + items_per_page
+    artworks = [artwork for artwork in s.artworks if artwork.hasimage]
+    total_pages = (len(artworks)//items_per_page) + 1
+    artworks = [artwork.list_info() for artwork in artworks[start_index:end_index]]
+    return render_template('saint_artworks.html', page=page, name=s.name, artworks=artworks, num_pages=total_pages,
+                           current_page=page, qid=qid)
+
+@app.route("/saint/<qid>/image_dump")
+def saint_images_dump(qid):
+    s = corp.QIDsaints[qid]
+    artworks = [artwork for artwork in s.artworks if artwork.hasimage]
+    objs = []
+    for artwork in artworks:
+        objs.append({
+            'source': artwork.objectvalue,
+            'images': artwork.images
+        })
+    return render_template('image_dump.html', name=s.name, objs=objs)
+
 @app.route('/artwork/<a>')
 def artwork(a):
     a = corp.QIDartworks[a]
-    name, materials, collection, creators = a.get_english()
-    str_materials = ''
-    if len(materials) > 1:
-        for mat in materials:
-            str_materials = str_materials + str(mat) + '; '
-    else:
-        str_materials = materials[0]
-    str_collection = ''
-    if len(collection) > 1:
-        for col in collection:
-            str_collection = str_collection + str(col) + '; '
-    else:
-        str_collection = collection[0]
-    str_creators = ''
-    if len(creators) > 1:
-        for cre in creators:
-            str_creators = str_creators + str(cre) + '; '
-    else:
-        str_creators = creators[0]
-    date = str(a.date)
-    return render_template('artwork.html', name=name, date=date, materials=str_materials, collection=str_collection,
-                           creators=str_creators, url=a.objectvalue, images=a.images)
+    obj = a.info()
+    return render_template('artwork.html', obj=obj)
 
 
 if __name__ == '__main__':
+    clean_temp()
     multiprocessing.freeze_support()
-    app.run(debug=True)
+    app.run(debug=False)

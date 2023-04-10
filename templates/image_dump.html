@@ -1,0 +1,22 @@
+{%extends "base.html"%}
+{%block title%} Artworks with: {{name}} {%endblock%}
+
+{% block content %}
+<div class="container">
+        <h1 class="text-center">Images of {{name}} (page {{page}})</h1>
+</div>
+<div class="container">
+    {% for obj in objs %}
+        <div class="row">
+            {% for img_url in obj['images'] %}
+                <div class="col">
+                    <img src="{{img_url}}" alt="Image description" style ="max-width: 100%; max-height: 750px">
+                </div>
+            {% endfor %}
+        </div>
+        <div class="row">
+              <a href="{{obj['source']}}">Data source</a>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
