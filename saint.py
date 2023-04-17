@@ -44,6 +44,8 @@ class Saint:
             G.add_edge(edge[0], edge[1], weight=edge_weight[edge])
         label = {}
         for node in G.nodes:
+            G.nodes[node]['order'] = node.orders
+            G.nodes[node]['gender'] = node.gender
             label[node] = node.name
         nx.relabel_nodes(G, label, copy=False)
         node_degree = dict(G.degree)
@@ -138,3 +140,26 @@ class Saint:
                 'modularity': modularity
             })
         return graphs
+
+    def gender_network(self):
+        G = self.build_network()
+        net = Network(width='100%', height='750', bgcolor='#222222', font_color='white')
+
+        for node_id, node_attrs in G.nodes(data=True):
+            gender = node_attrs['gender']
+
+            # set color of node based on gender attribute
+            if gender == 'male':
+                color = 'blue'
+            elif gender == 'female':
+                color = 'red'
+            else:
+                color = 'gray'
+
+            net.add_node(node_id, label=node_id, color=color)
+
+        # add edges to the Pyvis network object
+        for edge in G.edges():
+            net.add_edge(edge[0], edge[1])
+        net.force_atlas_2based()
+        return net

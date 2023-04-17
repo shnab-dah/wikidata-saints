@@ -33,3 +33,10 @@ def get_date(obj):
         return obj.date
     else:
         return 2050
+
+
+def colour_network(G, arg, val):
+    if arg == 'gender':
+        pass
+    elif arg == 'order':
+        pass

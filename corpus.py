@@ -103,6 +103,7 @@ class Corpus:
         data = data[cols]
         # set DF index = QID
         data.set_index('QID', inplace=True, drop=True)
+        data.to_json('./data/objects.json')
         return data
 
     def init_artworks(self):
@@ -219,7 +220,8 @@ class Corpus:
 
         label = {}
         for node in G.nodes:
-            G.nodes[node]['order'] = node.orders[0]
+            orders = ''.join(node.orders)
+            G.nodes[node]['order'] = node.orders
             G.nodes[node]['gender'] = node.gender
             label[node] = node.name
         nx.relabel_nodes(G, label, copy=False)
@@ -271,8 +273,8 @@ class Corpus:
             # make connections into edges
             for edge in edge_weight:
                 G.add_edge(edge[0], edge[1], weight=edge_weight[edge])
-            communities = community_louvain.best_partition(G)
-            nx.set_node_attributes(G, communities, 'group')
+            # communities = community_louvain.best_partition(G)
+            # nx.set_node_attributes(G, communities, 'group')
             label = {}
             for node in G.nodes:
                 label[node] = node.name
@@ -364,9 +366,71 @@ class Corpus:
         dict[qid] = str(label)
         return dict
 
+    def gender_network(self, save=True):
+        G = self.network
+        net = Network(width='1000', height='1500', bgcolor='#222222', font_color='white')
+
+        for node_id, node_attrs in G.nodes(data=True):
+            gender = node_attrs['gender']
+            size = node_attrs['size']
+            # set color of node based on gender attribute
+            if gender == 'male':
+                color = 'blue'
+            elif gender == 'female':
+                color = 'red'
+            else:
+                color = 'gray'
+
+            net.add_node(node_id, label=node_id, color=color, size=size)
+
+        # add edges to the Pyvis network object
+        for edge in G.edges():
+            net.add_edge(edge[0], edge[1])
+        net.force_atlas_2based()
+        if save:
+            net.save_graph(f'./static/temp/corpus-gender-network.html')
+        else:
+            return net
+
+    def order_network(self, arg='Franciscans', save=True):
+        G = self.network
+        net = Network(width='1000', height='1000', bgcolor='#222222', font_color='white')
+
+        for node_id, node_attrs in G.nodes(data=True):
+            order = node_attrs['order']
+            size = node_attrs['size']
+            # set color of node based on gender attribute
+            if arg in order:
+                color = 'blue'
+            else:
+                color = 'gray'
+
+            net.add_node(node_id, label=node_id, color=color, size=size)
+
+        # add edges to the Pyvis network object
+        for edge in G.edges():
+            net.add_edge(edge[0], edge[1])
+        net.force_atlas_2based()
+        if save:
+            net.save_graph(f'./static/temp/corpus-{arg}-network.html')
+        else:
+            return net
+
+    def order_stats(self):
+        saints = [s for s in self.saints.values()]
+        order_freq = {}
+
+        for s in saints:
+            orders = s.orders
+            for order in orders:
+                if order in order_freq:
+                    order_freq[order] += 1
+                else:
+                    order_freq[order] = 1
+        return order_freq
+
 if __name__ == "__main__":
     corp = Corpus(localdata=True)
-    saints = [saint for saint in corp.saints.values()]
-    for saint in saints:
-       years = [artwork.date for artwork in saint.artworks]
-       print(years)
+    print(corp.order_stats())
+    G = corp.order_network(arg='Society of Jesus', save=False)
+    G.show('./static/temp/test.html', notebook=False)
