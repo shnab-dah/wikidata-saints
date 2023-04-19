@@ -1,0 +1,29 @@
+{%extends "base.html"%}
+{%block title%} Saint comparison of: {{name}} {%endblock%}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <h1 class="text-center">Louvain communities</h1>
+    </div>
+    <div class="row">
+        <iframe src="/static/temp/{{qid}}-network-com.html" height="800" width="100%"></iframe>
+    </div>
+    <div class="row">
+        <h1 class="text-center">Gender communities</h1>
+    </div>
+    <div class="row">
+        <iframe src="/static/temp/{{qid}}-gendernetwork.html" height="800" width="100%"></iframe>
+    </div>
+    {% for order in orders %}
+   <div class="row">
+        <h1 class="text-center">{{order}}</h1>
+    </div>
+    <div class="row">
+        <iframe src="/static/temp/{{qid}}-{{order}}-network.html" height="800" width="100%"></iframe>
+    </div>
+    {% endfor %}
+
+
+</div>
+{% endblock %}

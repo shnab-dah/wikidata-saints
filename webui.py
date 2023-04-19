@@ -11,7 +11,7 @@ from corpus import Corpus
 import os
 
 
-corp = Corpus()
+corp = Corpus(localdata=True)
 pd.options.plotting.backend = 'plotly'
 app = Flask('Saint analysis')
 
@@ -97,6 +97,9 @@ def saint_page(s):
     except:
         clustering, density, partition, modularity = 0, 0, 0, 0
 
+    # fix saint object error TODO: figure out cause
+    for node in G.nodes:
+        G.nodes[node]['obj'] = None
     # plot network
     G2 = Network(width='100%', height='750', bgcolor='#222222', font_color='white')
     G2.from_nx(G)
@@ -152,6 +155,23 @@ def network_progression(s):
              auto_open=False)
     return render_template('network_progression.html', ranges=ranges, name=s.name, qid=qid)
 
+@app.route('/saint/<s>/network_comparison')
+def saint_network_compare(s):
+    qid = s
+    s = corp.QIDsaints[s]
+    G = s.build_network()
+    community_network = Network(width='100%', height='750', bgcolor='#222222', font_color='white')
+    for node in G.nodes:
+        G.nodes[node]['obj'] = None
+    community_network.from_nx(G)
+    community_network.force_atlas_2based()
+    community_network.save_graph(f'./static/temp/{qid}-network-com.html')
+    s.gender_network()
+    orders = [order for order in s.orders if order != 'None']
+    for order in s.orders:
+        if order != 'None':
+            s.order_network(arg=order)
+    return render_template('saint-network-comparison.html', orders=orders, name=s.name, qid=qid)
 
 @app.route('/saint/<qid>/images/<int:page>')
 def saint_images(qid, page):

@@ -46,6 +46,7 @@ class Saint:
         for node in G.nodes:
             G.nodes[node]['order'] = node.orders
             G.nodes[node]['gender'] = node.gender
+            G.nodes[node]['obj'] = node
             label[node] = node.name
         nx.relabel_nodes(G, label, copy=False)
         node_degree = dict(G.degree)
@@ -141,13 +142,14 @@ class Saint:
             })
         return graphs
 
-    def gender_network(self):
+    def gender_network(self, save=True):
         G = self.build_network()
-        net = Network(width='100%', height='750', bgcolor='#222222', font_color='white')
+        net = nx.Graph()
+        net2 = Network(width='100%', height='750', bgcolor='#222222', font_color='white')
 
         for node_id, node_attrs in G.nodes(data=True):
             gender = node_attrs['gender']
-
+            size = node_attrs['size']
             # set color of node based on gender attribute
             if gender == 'male':
                 color = 'blue'
@@ -156,10 +158,57 @@ class Saint:
             else:
                 color = 'gray'
 
-            net.add_node(node_id, label=node_id, color=color)
+            net.add_node(node_id, label=node_id, color=color, size=size)
 
         # add edges to the Pyvis network object
-        for edge in G.edges():
-            net.add_edge(edge[0], edge[1])
+        for edge in G.edges(data=True):
+            # color edge red if both are member of order
+            if  G.nodes[edge[0]]['obj'].gender == G.nodes[edge[1]]['obj'].gender:
+                if G.nodes[edge[0]]['obj'].gender == 'male':
+                    net.add_edge(edge[0], edge[1], color='blue', weight=edge[2]['weight'])
+                elif G.nodes[edge[0]]['obj'].gender == 'female':
+                    net.add_edge(edge[0], edge[1], color='red', weight=edge[2]['weight'])
+                else:
+                    net.add_edge(edge[0], edge[1], color='gray', weight=edge[2]['weight'])
+            else:
+                net.add_edge(edge[0], edge[1], color='gray', weight=edge[2]['weight'])
+        net2.from_nx(net)
+        net = net2
         net.force_atlas_2based()
-        return net
+        if save:
+            net.save_graph(f'./static/temp/{self.QID}-gendernetwork.html')
+        else:
+            return net
+
+    def order_network(self, arg='', save=True):
+        G = self.build_network()
+        net = nx.Graph()
+        net2 = Network(width='100%', height='750', bgcolor='#222222', font_color='white')
+
+        for node_id, node_attrs in G.nodes(data=True):
+            order = node_attrs['order']
+            size = node_attrs['size']
+            # set color of node based on gender attribute
+            if arg in order:
+                color = 'red'
+            else:
+                color = 'gray'
+
+            net.add_node(node_id, label=node_id, color=color, size=size)
+
+        # add edges to the Pyvis network object
+        for edge in G.edges(data=True):
+            # color edge red if both are member of order
+            if arg not in G.nodes[edge[0]]['obj'].orders or arg not in G.nodes[edge[1]]['obj'].orders:
+                net.add_edge(edge[0], edge[1], color='gray', weight=edge[2]['weight'])
+            else:
+                net.add_edge(edge[0], edge[1], color='red', weight=edge[2]['weight'])
+
+        net2.from_nx(net)
+        net = net2
+        net.force_atlas_2based()
+
+        if save:
+            net.save_graph(f'./static/temp/{self.QID}-{arg}-network.html')
+        else:
+            return net
