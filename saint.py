@@ -171,7 +171,7 @@ class Saint:
                 else:
                     net.add_edge(edge[0], edge[1], color='gray', weight=edge[2]['weight'])
             else:
-                net.add_edge(edge[0], edge[1], color='gray', weight=edge[2]['weight'])
+                net.add_edge(edge[0], edge[1], color='green', weight=edge[2]['weight'])
         net2.from_nx(net)
         net = net2
         net.force_atlas_2based()

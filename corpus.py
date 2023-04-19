@@ -220,9 +220,10 @@ class Corpus:
 
         label = {}
         for node in G.nodes:
-            orders = ''.join(node.orders)
-            G.nodes[node]['order'] = node.orders
+            order = ''.join(node.orders)
+            G.nodes[node]['order'] = order
             G.nodes[node]['gender'] = node.gender
+            G.nodes[node]['obj'] = node
             label[node] = node.name
         nx.relabel_nodes(G, label, copy=False)
         node_degree = dict(G.degree)
@@ -277,8 +278,9 @@ class Corpus:
             # nx.set_node_attributes(G, communities, 'group')
             label = {}
             for node in G.nodes:
+                orders = ''.join(node.orders)
                 label[node] = node.name
-                G.nodes[node]['order'] = node.orders[0]
+                G.nodes[node]['order'] = orders
                 G.nodes[node]['gender'] = node.gender
             nx.relabel_nodes(G, label, copy=False)
             node_degree = dict(G.degree)
@@ -454,5 +456,6 @@ class Corpus:
 
 if __name__ == "__main__":
     corp = Corpus(localdata=True)
-    corp.order_network(save=False).show('franciscans.html', notebook=False)
-    corp.gender_network(save=False).show('corpus-gender.html', notebook=False)
+    print(corp.order_stats())
+
+    # benedictines (85), franciscans (18), cistercians (9), society of jesus (16), third order of saint francis (13), order of friars minor (11_, domincan order (24)
