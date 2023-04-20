@@ -12,6 +12,8 @@ import time
 from wikidata.client import Client
 import multiprocessing
 import functionality as func
+from plotly.offline import plot
+
 
 
 class Corpus:
@@ -398,7 +400,7 @@ class Corpus:
                 else:
                     net.add_edge(edge[0], edge[1], color='gray', weight=edge[2]['weight'])
             else:
-                net.add_edge(edge[0], edge[1], color='gray', weight=edge[2]['weight'])
+                net.add_edge(edge[0], edge[1], color='green', weight=edge[2]['weight'])
 
         net2.from_nx(net)
         net = net2
@@ -407,7 +409,7 @@ class Corpus:
             net.save_graph(f'./static/temp/corpus-gender-network.html')
         else:
             return net
-#TODO: fix color edges & edge-weigth
+    #TODO: fix color edges & edge-weigth
     def order_network(self, arg='Franciscans', save=True):
         G = self.network
         net = nx.Graph()
@@ -422,7 +424,7 @@ class Corpus:
             else:
                 color = 'gray'
 
-            net.add_node(node_id, label=node_id, color=color, size=size)
+            net.add_node(node_id, label=node_id, color=color, size=size, title=order)
 
         # add edges to the Pyvis network object
         # add edges to the Pyvis network object
@@ -454,8 +456,104 @@ class Corpus:
                     order_freq[order] = 1
         return order_freq
 
+    def corpus_order_network(self):
+        orders = sorted(corp.order_stats().items(), key=lambda x:x[1], reverse=True)
+        orders = [ord[0] for ord in orders]
+        # filter out 'None'
+        orders = orders [1:11]
+        colors = ['blue', 'green', 'red', 'yellow', 'purple',
+                  'black', 'pink', 'indigo', 'tan', 'gold']
+        color_map = {}
+        for counter, color in enumerate(colors):
+            color_map[orders[counter]] = color
+
+        print(color_map)
+
+        G = self.network
+        net = nx.Graph()
+        net2 = Network(width='100%', height='750', bgcolor='#222222', font_color='white')
+
+        for node_id, node_attrs in G.nodes(data=True):
+            order = node_attrs['obj'].orders[0]
+            size = node_attrs['size']
+            # set color of node based on gender attribute
+            if order in color_map:
+                print(order, color_map[order])
+                color = color_map[order]
+            else:
+                color = 'gray'
+
+            net.add_node(node_id, label=node_id, color=color, size=size, title=','.join(node_attrs['obj'].orders))
+
+        # add edges to the Pyvis network object
+        for edge in G.edges(data=True):
+            # color edge red if both are member of order
+            if G.nodes[edge[0]]['obj'].orders[0] not in orders or G.nodes[edge[1]]['obj'].orders[0] not in orders:
+                net.add_edge(edge[0], edge[1], color='gray', weight=edge[2]['weight'])
+            elif G.nodes[edge[0]]['obj'].orders[0] in G.nodes[edge[1]]['obj'].orders:
+                net.add_edge(edge[0], edge[1], color=color_map[G.nodes[edge[0]]['obj'].orders[0]],
+                             weight=edge[2]['weight'])
+            else:
+                net.add_edge(edge[0], edge[1], color='gray', weight=edge[2]['weight'])
+
+        net2.from_nx(net)
+        net = net2
+        net.force_atlas_2based()
+        return net
+
+    def centrality_over_frequency(self, save=True):
+        saints = [saint for saint in self.saints.values()]
+        data = []
+        G = self.network
+        degree_centrality_dict = nx.degree_centrality(G)
+        closeness_centrality_dict = nx.closeness_centrality(G)
+        betweenness_centrality_dict = nx.betweenness_centrality(G)
+
+        for saint in saints:
+            name = saint.name
+            freq = saint.frequency
+            try:
+                degree_centrality = degree_centrality_dict[name]
+            except:
+                degree_centrality = 0
+            try:
+                closeness_centrality = closeness_centrality_dict[name]
+            except:
+                closeness_centrality = 0
+            try:
+                betweenness_centrality = betweenness_centrality_dict[name]
+            except:
+                betweenness_centrality = 0
+
+            data.append((name, freq, degree_centrality, closeness_centrality, betweenness_centrality))
+
+        degree_plot = px.scatter(data, x=1, y=2, text=0)
+        degree_plot.update_layout(title="Degree centrality over depcitions",
+                                  xaxis_title='Number of depictions',
+                                  yaxis_title='Degree centrality')
+
+        closeness_plot = px.scatter(data, x=1, y=3, text=0)
+        closeness_plot.update_layout(title="Closeness centrality over depcitions",
+                                     xaxis_title='Number of depictions',
+                                     yaxis_title='Closeness centrality')
+
+        betweenness_plot = px.scatter(data, x=1, y=4, text=0)
+        betweenness_plot.update_layout(title='Betweenness centrality over depictions',
+                                       xaxis_title='Number of depictions',
+                                       yaxis_title='Betweenness centrality')
+        if save:
+            plot(degree_plot, filename='./static/temp/corpus-degree-scatter.html', auto_open=False)
+            plot(closeness_plot, filename='./static/temp/corpus-closeness-scatter.html', auto_open=False)
+            plot(betweenness_plot, filename='./static/temp/corpus-betweenness-scatter.html', auto_open=False)
+        else:
+            return { 'degree': degree_plot,
+                     'closeness': closeness_plot,
+                     'betweenness': betweenness_plot}
+
+
 if __name__ == "__main__":
     corp = Corpus(localdata=True)
-    print(corp.order_stats())
+    plots = corp.centrality_over_frequency()
+    for plot in plots.values():
+        plot.show()
 
-    # benedictines (85), franciscans (18), cistercians (9), society of jesus (16), third order of saint francis (13), order of friars minor (11_, domincan order (24)

@@ -47,6 +47,7 @@ class Saint:
             G.nodes[node]['order'] = node.orders
             G.nodes[node]['gender'] = node.gender
             G.nodes[node]['obj'] = node
+            G.nodes[node]['title'] = node.name
             label[node] = node.name
         nx.relabel_nodes(G, label, copy=False)
         node_degree = dict(G.degree)
@@ -158,7 +159,7 @@ class Saint:
             else:
                 color = 'gray'
 
-            net.add_node(node_id, label=node_id, color=color, size=size)
+            net.add_node(node_id, label=node_id, color=color, size=size, title=gender)
 
         # add edges to the Pyvis network object
         for edge in G.edges(data=True):
@@ -194,7 +195,7 @@ class Saint:
             else:
                 color = 'gray'
 
-            net.add_node(node_id, label=node_id, color=color, size=size)
+            net.add_node(node_id, label=node_id, color=color, size=size, title=order)
 
         # add edges to the Pyvis network object
         for edge in G.edges(data=True):

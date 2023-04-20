@@ -11,7 +11,7 @@ from corpus import Corpus
 import os
 
 
-corp = Corpus(localdata=True)
+corp = Corpus(localdata=False)
 pd.options.plotting.backend = 'plotly'
 app = Flask('Saint analysis')
 
@@ -34,6 +34,7 @@ def about():
 @app.route('/corpus')
 def corpus():
     G = corp.network
+    corp.centrality_over_frequency()
     # network data
     clustering = nx.average_clustering(G)
     density = nx.density(G)
