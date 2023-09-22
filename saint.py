@@ -21,6 +21,8 @@ class Saint:
         self.gender = ''
         self.orders = []
         self.groups = []
+        self.birthplace = []
+        self.burialplace = []
 
     def plot_histogram(self):
         dates = [artwork.date for artwork in self.artworks if artwork.dated]

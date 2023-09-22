@@ -1,6 +1,5 @@
 import pandas as pd
 from SPARQLWrapper import SPARQLWrapper, JSON
-import time
 
 
 def update_data():
@@ -65,16 +64,12 @@ def get_saints2():
     query = """SELECT  ?saintUID 
     (group_concat(DISTINCT ?bd;separator=";") as ?birthDate)
     (group_concat(DISTINCT ?dd;separator=";") as ?deathDate)
-    (group_concat(DISTINCT ?dd;separator=";") as ?birthPlace)
-    (group_concat(DISTINCT ?religious_order;separator=";") as ?deathPlace)
               WHERE{
   ?saintUID  wdt:P411 ?sanctity.
   OPTIONAL {?saintUID wdt:P569 ?bd}
   OPTIONAL {?saintUID wdt:P570 ?dd}
-  OPTIONAL {?saintUID wdt:P19 ?bp}
-  OPTIONAL {?saintUID wdt:P20 ?dp}
 }
-GROUP BY ?saintUID ?birthDate ?deathDate ?birthPlace ?deathPlace"""
+GROUP BY ?saintUID ?birthDate ?deathDate"""
 
     user_agent = "SaintAnalyzer/0.0"
     # set sparql settings
@@ -91,7 +86,39 @@ GROUP BY ?saintUID ?birthDate ?deathDate ?birthPlace ?deathPlace"""
     data["QID"] = new[4]
     cols = ['QID',
             'birthDate.value',
-            'deathDate.value',
+            'deathDate.value'
+            ]
+    data = data[cols]
+    data = data.set_index("QID", drop=True)
+    return data
+
+
+def get_saints3():
+    endpoint_url = "https://query.wikidata.org/sparql"
+    query = """SELECT  ?saintUID 
+    (group_concat(DISTINCT ?dp;separator=";") as ?birthPlace)
+    (group_concat(DISTINCT ?bp;separator=";") as ?deathPlace)
+              WHERE{
+  ?saintUID  wdt:P411 ?sanctity.
+  OPTIONAL {?saintUID wdt:P19 ?bp}
+  OPTIONAL {?saintUID wdt:P20 ?dp}
+}
+GROUP BY ?saintUID ?birthPlace ?deathPlace"""
+
+    user_agent = "SaintAnalyzer/0.0"
+    # set sparql settings
+    sparql = SPARQLWrapper(endpoint_url, agent=user_agent)
+    sparql.setQuery(query)
+    sparql.setReturnFormat(JSON)
+    # query wikidata
+    results = sparql.query().convert()
+    # convert to json pd
+    data = pd.json_normalize(results['results']['bindings'])
+
+    # add QID
+    new = data['saintUID.value'].str.split("/", n=-1, expand=True)
+    data["QID"] = new[4]
+    cols = ['QID',
             'birthPlace.value',
             'deathPlace.value'
             ]
@@ -100,8 +127,39 @@ GROUP BY ?saintUID ?birthDate ?deathDate ?birthPlace ?deathPlace"""
     return data
 
 
+def get_saints4():
+    endpoint_url = "https://query.wikidata.org/sparql"
+    query = """SELECT  ?saintUID 
+    (group_concat(DISTINCT ?bp;separator=";") as ?burialPlace)
+              WHERE{
+  ?saintUID  wdt:P411 ?sanctity.
+  OPTIONAL {?saintUID wdt:P119 ?bp}
+}
+GROUP BY ?saintUID ?burialPlace"""
+
+    user_agent = "SaintAnalyzer/0.0"
+    # set sparql settings
+    sparql = SPARQLWrapper(endpoint_url, agent=user_agent)
+    sparql.setQuery(query)
+    sparql.setReturnFormat(JSON)
+    # query wikidata
+    results = sparql.query().convert()
+    # convert to json pd
+    data = pd.json_normalize(results['results']['bindings'])
+
+    # add QID
+    new = data['saintUID.value'].str.split("/", n=-1, expand=True)
+    data["QID"] = new[4]
+    cols = ['QID',
+            'burialPlace.value'
+            ]
+    data = data[cols]
+    data = data.set_index("QID", drop=True)
+    return data
+
+
 def get_saints():
-    dfs = [get_saints1(), get_saints2()]
+    dfs = [get_saints1(), get_saints2(), get_saints3(), get_saints4()]
     data = pd.concat(dfs, axis=1)
     return data
 

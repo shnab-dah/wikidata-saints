@@ -67,6 +67,9 @@ def corpus():
 def corp_network():
     G = corp.network
     G2 = Network(width='1450', height='800px', bgcolor='#222222', font_color='white', filter_menu=False)
+    # fix saint object error TODO: figure out cause
+    for node in G.nodes:
+        G.nodes[node]['obj'] = None
     G2.from_nx(G)
     G2.force_atlas_2based()
     G2.save_graph('./static/temp/corpus-network.html')

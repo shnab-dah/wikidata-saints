@@ -131,6 +131,8 @@ class Corpus:
             saint.name = self.saintnames[saint.QID]
             saint.artworks = sorted(saint.artworks, key=func.get_date)
             saint.gender = self.sdf['gender.value'].loc[saint.QID]
+            saint.birthplace = self.sdf['birthPlace.value'].loc[saint.QID]
+            saint.burialplace = self.sdf['burialPlace.value'].loc[saint.QID]
             if saint.gender != 'male' and saint.gender != 'female':
                 saint.gender = "undefined"
 
@@ -553,7 +555,28 @@ class Corpus:
 
 if __name__ == "__main__":
     corp = Corpus(localdata=True)
-    plots = corp.centrality_over_frequency()
-    for plot in plots.values():
-        plot.show()
+    saints = [s for s in corp.saints.values()]
+    print(len(saints))
+    freq = {}
+    for saint in saints:
+        birthplaces = saint.birthplace.split(';')
+        for birthplace in birthplaces:
+            if birthplace in freq:
+                freq[birthplace] += 1
+            else:
+                freq[birthplace] = 1
+    print(len(freq))
+    order = sorted(freq.items(), key=lambda x:x[1], reverse=True)
+    print(order)
 
+    freq_burial = {}
+    for saint in saints:
+        burial_place = saint.burialplace.split(';')
+        for bp in burial_place:
+            if bp in freq_burial:
+                freq_burial[bp] += 1
+            else:
+                freq_burial[bp] = 1
+    print(len(freq_burial))
+    ordered = sorted(freq_burial.items(), key=lambda x:x[1], reverse=True)
+    print(ordered)
