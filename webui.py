@@ -11,7 +11,7 @@ from corpus import Corpus
 import os
 
 
-corp = Corpus(localdata=False)
+corp = Corpus(localdata=True)
 pd.options.plotting.backend = 'plotly'
 app = Flask('Saint analysis')
 
